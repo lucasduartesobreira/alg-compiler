@@ -1,0 +1,33 @@
+{
+  "name": "mgol-compiler",
+  "version": "0.1.0",
+  "description": "This is a compiler to mgol language",
+  "main": "index.js",
+  "repository": "git@github.com:lucasduartesobreira/mgol-compiler.git",
+  "author": "Lucas Duarte Sobreira <lucasduartesobreira@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.ts"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint"
+    }
+  },
+  "dependencies": {
+    "jest": "^29.3.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.2.3",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.29.0",
+    "husky": "^8.0.2",
+    "prettier": "^2.8.0"
+  }
+}
