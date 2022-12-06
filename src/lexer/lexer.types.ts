@@ -1,5 +1,5 @@
-import { Reader } from "@/lexer/file.types"
-import { Token } from "./automata.types"
+import { Reader } from '@/lexer/file.types'
+import { Token } from './automata.types'
 
 type Lexer = {
   nextToken(): Token
@@ -7,7 +7,4 @@ type Lexer = {
 
 type LexerConstructor = (reader: Reader) => Lexer
 
-export {
-  Lexer,
-  LexerConstructor
-}
+export { Lexer, LexerConstructor }

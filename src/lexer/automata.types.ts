@@ -1,4 +1,4 @@
-import { Either } from "@/utils/types"
+import { Either } from '@/utils/types'
 
 type State = number
 
@@ -7,13 +7,23 @@ type Automata = {
 }
 
 type Token = {
-  type: 'NUM' | 'LIT' | 'ID' | 'COMMENT' | 'EOF' | 'OPR' | 'ATR' | 'OPA' | 'AB_P' | 'FC_P' | 'PT_V' | 'VIR' | 'ERROR',
-  details: string,
-  start: number,
+  type:
+    | 'NUM'
+    | 'LIT'
+    | 'ID'
+    | 'COMMENT'
+    | 'EOF'
+    | 'OPR'
+    | 'ATR'
+    | 'OPA'
+    | 'AB_P'
+    | 'FC_P'
+    | 'PT_V'
+    | 'VIR'
+    | 'ERROR'
+  details: string
+  start: number
   end: number
 }
 
-export {
-  Automata,
-  Token
-}
+export { Automata, Token }

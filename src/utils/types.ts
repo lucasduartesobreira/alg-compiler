@@ -1,14 +1,11 @@
-type Either<A, B> = {left: A} | {right: B}
+type Either<A, B> = { left: A } | { right: B }
 
 const left = <A, B>(a: A): Either<A, B> => {
-  return {left: a}
+  return { left: a }
 }
 
 const right = <A, B>(b: B): Either<A, B> => {
-  return {right: b}
+  return { right: b }
 }
 
-export {
-  Either,
-  left, right
-}
+export { Either, left, right }
