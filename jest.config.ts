@@ -3,9 +3,16 @@ import { defaults } from 'jest-config'
 
 const config: Config = {
   ...defaults,
+  preset: 'ts-jest',
+  testEnvironment: 'node',
   verbose: true,
   moduleFileExtensions: ['ts', ...defaults.moduleFileExtensions],
-  collectCoverageFrom: ['src/**/*.ts', '!**/node_modules/**'],
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/**/*.types.ts',
+    '!src/utils/types.ts',
+    '!**/node_modules/**'
+  ],
   coverageThreshold: {
     global: {
       branches: 80,
@@ -16,4 +23,3 @@ const config: Config = {
 }
 
 export default config
-
