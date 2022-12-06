@@ -1,5 +1,12 @@
 import { Reader } from '@/lexer/file.types'
-import { Token } from './automata.types'
+import { TypeofToken } from './automata.types'
+
+type Token = {
+  type: TypeofToken
+  details: string
+  start: number
+  end: number
+}
 
 type Lexer = {
   nextToken(): Token
