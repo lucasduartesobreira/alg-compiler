@@ -22,7 +22,8 @@ const testAutomataToSet = (setOfExamples: ExamplesToTest) => {
 
     expect(accepted).toBe(expectedToBeAccepted)
     expect(stateInfo.description).toBe(stateInfoExpected.description)
-    expect(stateInfo.typeofToken).toBe(stateInfoExpected.typeofToken)
+    expect(stateInfo.classOfToken).toBe(stateInfoExpected.classOfToken)
+    expect(stateInfo.typeOfToken).toBe(stateInfoExpected.typeOfToken)
   }
 }
 
@@ -30,17 +31,20 @@ describe('Testing automata', () => {
   test('identify a number', () => {
     const stateInfoInteger: ExpectedStateInfo = {
       description: 'Número inteiro',
-      typeofToken: 'NUM'
+      classOfToken: 'NUM',
+      typeOfToken: 'INTEIRO'
     }
 
     const stateInfoRealNumber: ExpectedStateInfo = {
       description: 'Número real',
-      typeofToken: 'NUM'
+      classOfToken: 'NUM',
+      typeOfToken: 'REAL'
     }
 
     const stateInfoExpNumber: ExpectedStateInfo = {
       description: 'Número exponencial',
-      typeofToken: 'NUM'
+      classOfToken: 'NUM',
+      typeOfToken: 'REAL'
     }
 
     const numberExamples = [
@@ -1402,7 +1406,8 @@ describe('Testing automata', () => {
   test('identify a literal', () => {
     const stateInfoExpected: ExpectedStateInfo = {
       description: 'Literal',
-      typeofToken: 'LIT'
+      classOfToken: 'LIT',
+      typeOfToken: 'LITERAL'
     }
 
     const literalExamples = [
@@ -1426,7 +1431,8 @@ describe('Testing automata', () => {
   test('identify an id', () => {
     const stateInfoIdExpected: ExpectedStateInfo = {
       description: 'Identifier',
-      typeofToken: 'ID'
+      classOfToken: 'ID',
+      typeOfToken: 'NULO'
     }
 
     const idExamples = [
@@ -3258,7 +3264,8 @@ describe('Testing automata', () => {
   test('identify a commentary', () => {
     const stateInfoCommentExpected: ExpectedStateInfo = {
       description: 'Commentary',
-      typeofToken: 'COMMENT'
+      classOfToken: 'COMMENT',
+      typeOfToken: 'NULO'
     }
 
     const commentExamples = [
@@ -3285,7 +3292,7 @@ describe('Testing automata', () => {
     const accepted = Automata.acceptState(state)
 
     expect(accepted.accepted).toBeTruthy()
-    expect(accepted.stateInfo.typeofToken).toBe('EOF')
+    expect(accepted.stateInfo.classOfToken).toBe('EOF')
     expect(accepted.stateInfo.description).toBe('End of file')
   })
 
@@ -3294,40 +3301,45 @@ describe('Testing automata', () => {
       {
         stringToTest: '>',
         stateInfoExpected: {
-          typeofToken: 'OPR',
-          description: '>'
+          classOfToken: 'OPR',
+          description: '>',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: true
       },
       {
         stringToTest: '>=',
         stateInfoExpected: {
-          typeofToken: 'OPR',
-          description: '>='
+          classOfToken: 'OPR',
+          description: '>=',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: true
       },
       {
         stringToTest: '<',
         stateInfoExpected: {
-          typeofToken: 'OPR',
-          description: '<'
+          classOfToken: 'OPR',
+          description: '<',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: true
       },
       {
         stringToTest: '<=',
         stateInfoExpected: {
-          typeofToken: 'OPR',
-          description: '<='
+          classOfToken: 'OPR',
+          description: '<=',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: true
       },
       {
         stringToTest: '<>',
         stateInfoExpected: {
-          typeofToken: 'OPR',
-          description: '<>'
+          classOfToken: 'OPR',
+          description: '<>',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: true
       }
@@ -3341,8 +3353,9 @@ describe('Testing automata', () => {
       {
         stringToTest: '<-',
         stateInfoExpected: {
-          typeofToken: 'ATR',
-          description: '<-'
+          classOfToken: 'ATR',
+          description: '<-',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: true
       }
@@ -3353,8 +3366,9 @@ describe('Testing automata', () => {
 
   test('identify OPA', () => {
     const stateInfo: ExpectedStateInfo = {
-      typeofToken: 'OPA',
-      description: 'Arithmetic Operator'
+      classOfToken: 'OPA',
+      description: 'Arithmetic Operator',
+      typeOfToken: 'NULO'
     }
     const opaExamples = [
       {
@@ -3386,7 +3400,11 @@ describe('Testing automata', () => {
     const ab_pExamples: ExamplesToTest = [
       {
         stringToTest: '(',
-        stateInfoExpected: { typeofToken: 'AB_P', description: '(' },
+        stateInfoExpected: {
+          classOfToken: 'AB_P',
+          description: '(',
+          typeOfToken: 'NULO'
+        },
         expectedToBeAccepted: true
       }
     ]
@@ -3398,7 +3416,11 @@ describe('Testing automata', () => {
     const fc_pExamples: ExamplesToTest = [
       {
         stringToTest: ')',
-        stateInfoExpected: { typeofToken: 'FC_P', description: ')' },
+        stateInfoExpected: {
+          classOfToken: 'FC_P',
+          description: ')',
+          typeOfToken: 'NULO'
+        },
         expectedToBeAccepted: true
       }
     ]
@@ -3410,7 +3432,11 @@ describe('Testing automata', () => {
     const pt_vExamples: ExamplesToTest = [
       {
         stringToTest: ';',
-        stateInfoExpected: { typeofToken: 'PT_V', description: ';' },
+        stateInfoExpected: {
+          classOfToken: 'PT_V',
+          description: ';',
+          typeOfToken: 'NULO'
+        },
         expectedToBeAccepted: true
       }
     ]
@@ -3422,7 +3448,11 @@ describe('Testing automata', () => {
     const virExamples: ExamplesToTest = [
       {
         stringToTest: ',',
-        stateInfoExpected: { typeofToken: 'VIR', description: ',' },
+        stateInfoExpected: {
+          classOfToken: 'VIR',
+          description: ',',
+          typeOfToken: 'NULO'
+        },
         expectedToBeAccepted: true
       }
     ]
@@ -3435,136 +3465,153 @@ describe('Testing automata', () => {
       {
         stringToTest: '.1',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro token fora do padrão'
+          classOfToken: 'ERROR',
+          description: 'Erro token fora do padrão',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '1.',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro número real incompleto'
+          classOfToken: 'ERROR',
+          description: 'Erro número real incompleto',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '1e',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro exponencial incompleto'
+          classOfToken: 'ERROR',
+          description: 'Erro exponencial incompleto',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '1.0E',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro exponencial incompleto'
+          classOfToken: 'ERROR',
+          description: 'Erro exponencial incompleto',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '1E',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro exponencial incompleto'
+          classOfToken: 'ERROR',
+          description: 'Erro exponencial incompleto',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '1.00E',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro exponencial incompleto'
+          classOfToken: 'ERROR',
+          description: 'Erro exponencial incompleto',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '1.00e',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro exponencial incompleto'
+          classOfToken: 'ERROR',
+          description: 'Erro exponencial incompleto',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '1e+',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro exponencial incompleto'
+          classOfToken: 'ERROR',
+          description: 'Erro exponencial incompleto',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '1E+',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro exponencial incompleto'
+          classOfToken: 'ERROR',
+          description: 'Erro exponencial incompleto',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '1e-',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro exponencial incompleto'
+          classOfToken: 'ERROR',
+          description: 'Erro exponencial incompleto',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '1E-',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro exponencial incompleto'
+          classOfToken: 'ERROR',
+          description: 'Erro exponencial incompleto',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '"abcdef',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro literal incompleto'
+          classOfToken: 'ERROR',
+          description: 'Erro literal incompleto',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '"abcdefaskdhfj',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro literal incompleto'
+          classOfToken: 'ERROR',
+          description: 'Erro literal incompleto',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '"abcdefaskdhfj aalsdjkfh /?,.;12340981905823asdhbvc ',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro literal incompleto'
+          classOfToken: 'ERROR',
+          description: 'Erro literal incompleto',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '_abc',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro token fora do padrão'
+          classOfToken: 'ERROR',
+          description: 'Erro token fora do padrão',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '1abcd',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro token fora do padrão'
+          classOfToken: 'ERROR',
+          description: 'Erro token fora do padrão',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
         stringToTest: '{adhsjkf asjdhfk 1234 &83470982457+',
         stateInfoExpected: {
-          typeofToken: 'ERROR',
-          description: 'Erro comentário incompleto'
+          classOfToken: 'ERROR',
+          description: 'Erro comentário incompleto',
+          typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       }
