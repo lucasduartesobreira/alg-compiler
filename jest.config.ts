@@ -7,6 +7,7 @@ const config: Config = {
   testEnvironment: 'node',
   verbose: true,
   moduleFileExtensions: ['ts', ...defaults.moduleFileExtensions],
+  moduleNameMapper: { '^@/(.*)/(.*)$': '<rootDir>/src/$1/$2' },
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.types.ts',
