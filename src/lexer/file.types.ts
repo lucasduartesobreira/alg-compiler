@@ -1,5 +1,5 @@
 type Reader = {
-  nextChar(): { char: string; charNumber: number }
+  nextChar(): { char: string; charNumber: number; line: number; column: number }
 }
 
 type ReaderConstructor = (path: string) => Reader
