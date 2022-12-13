@@ -14,6 +14,7 @@ const testAutomataToSet = (setOfExamples: ExamplesToTest) => {
     let state = 0
     for (const char of stringToTest) {
       const returnFromAutomata = Automata.nextState(char, state)
+
       if (returnFromAutomata === -1) break
       state = returnFromAutomata
     }
@@ -3598,19 +3599,28 @@ describe('Testing automata', () => {
         expectedToBeAccepted: false
       },
       {
-        stringToTest: '1abcd',
+        stringToTest: '{adhsjkf asjdhfk 1234 83470982457+',
         stateInfoExpected: {
           classOfToken: 'ERROR',
-          description: 'Erro token fora do padrão',
+          description: 'Erro comentário incompleto',
           typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
       },
       {
-        stringToTest: '{adhsjkf asjdhfk 1234 &83470982457+',
+        stringToTest: '"abcdefaskdhfj aalsdjkfh &/?,.;12340981905823asdhbvc ',
         stateInfoExpected: {
           classOfToken: 'ERROR',
-          description: 'Erro comentário incompleto',
+          description: 'Erro caractere inválido',
+          typeOfToken: 'NULO'
+        },
+        expectedToBeAccepted: false
+      },
+      {
+        stringToTest: '@&¨',
+        stateInfoExpected: {
+          classOfToken: 'ERROR',
+          description: 'Erro caractere inválido',
           typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false
