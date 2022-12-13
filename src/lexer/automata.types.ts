@@ -32,11 +32,15 @@ type StateInfo = {
 }
 
 type StateTransitions = Map<Char, number>
-type TransitionTable = Map<State, StateTransitions>
+type TransitionTable = Map<
+  State,
+  { includeTransitions: StateTransitions; outOfAlphabetTransitions: State }
+>
 type UpdateTransitionTable = (
   actualState: State,
   nextState: State,
-  charOrString: string
+  charOrString: string,
+  outOfAlphabetTransitions?: State
 ) => void
 
 type AcceptableStates = Map<State, void>
@@ -55,5 +59,6 @@ export {
   UpdateTransitionTable,
   UpdateAcceptableStates,
   UpdateStatesInfo,
-  State
+  State,
+  TokenType
 }

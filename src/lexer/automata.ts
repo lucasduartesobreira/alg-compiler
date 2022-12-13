@@ -1,6 +1,7 @@
 import {
   AcceptableStates,
   Automata,
+  State,
   StateInfo,
   StatesInfo,
   TransitionTable,
@@ -13,13 +14,9 @@ const EOF = 'EOF'
 const DIGITS = '0123456789'
 const LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 const ALPHABET =
-  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRTUVWXYZ ?!;:,.<>=/*+-\\(){}_||\'[]"'
+  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ \n\t?!;:,.<>=/*+-\\(){}_||\'[]"'
 
 const ERRORS = {
-  INTEGER_NUMBER: {
-    STATE_INDEX: -2,
-    DESCRIPTION: 'Erro token fora do padrão'
-  },
   REAL_NUMBER: {
     STATE_INDEX: 2,
     DESCRIPTION: 'Erro número real incompleto'
@@ -42,7 +39,7 @@ const ERRORS = {
   },
   INVALID_CHARACTER: {
     STATE_INDEX: -3,
-    DESCRIPTION: 'Erro caractere inválido na linguágem'
+    DESCRIPTION: 'Erro caractere inválido'
   },
   INVALID_PATTERN: {
     STATE_INDEX: 0,
@@ -65,6 +62,8 @@ const createTransitionTable = () => {
   }
 
   createSkipWhiteSpaceOnStart(updateFunctions)
+
+  createInvalidCharacter(updateFunctions)
 
   createDetectNumberBranch(updateFunctions)
 
@@ -96,14 +95,19 @@ const createTransitionTable = () => {
 const addTransition =
   (transitionTable: TransitionTable) =>
   (
-    actualState: number,
-    nextState: number,
-    charOrString: string
+    actualState: State,
+    nextState: State,
+    charOrString: string,
+    outOfAlphabetTransitions?: State
   ): TransitionTable => {
     const stateTransitionTable = transitionTable.get(actualState)
 
     if (!stateTransitionTable) {
-      transitionTable.set(actualState, new Map())
+      transitionTable.set(actualState, {
+        includeTransitions: new Map(),
+        outOfAlphabetTransitions:
+          outOfAlphabetTransitions ?? ERRORS.INVALID_CHARACTER.STATE_INDEX
+      })
       return addTransition(transitionTable)(
         actualState,
         nextState,
@@ -111,7 +115,9 @@ const addTransition =
       )
     }
 
-    if (stateTransitionTable.has(charOrString)) {
+    const { includeTransitions } = stateTransitionTable
+
+    if (includeTransitions.has(charOrString)) {
       throw new Error(
         `Error trying to overwrite a transition on state: ${actualState} with char: ${charOrString}`
       )
@@ -119,10 +125,10 @@ const addTransition =
 
     if (charOrString !== EOF) {
       for (const char of charOrString) {
-        stateTransitionTable.set(char, nextState)
+        includeTransitions.set(char, nextState)
       }
     } else {
-      stateTransitionTable.set(EOF, nextState)
+      includeTransitions.set(EOF, nextState)
     }
 
     transitionTable.set(actualState, stateTransitionTable)
@@ -167,6 +173,31 @@ const createSkipWhiteSpaceOnStart = (updateFunctions: {
   })
 }
 
+const createInvalidCharacter = (updateFunctions: {
+  updateTransitionTable: UpdateTransitionTable
+  updateAcceptableStates: UpdateAcceptableStates
+  updateStatesInfo: UpdateStatesInfo
+}) => {
+  const { updateStatesInfo, updateTransitionTable } = updateFunctions
+
+  const invalidCharStateIndex = ERRORS.INVALID_CHARACTER.STATE_INDEX
+
+  updateTransitionTable(
+    invalidCharStateIndex,
+    invalidCharStateIndex,
+    '',
+    invalidCharStateIndex
+  )
+
+  updateStatesInfo({
+    state: ERRORS.INVALID_CHARACTER.STATE_INDEX,
+    classOfToken: 'ERROR',
+    description: ERRORS.INVALID_CHARACTER.DESCRIPTION,
+    typeOfToken: 'NULO',
+    canReadWhiteSpace: false
+  })
+}
+
 const createDetectNumberBranch = (updateFunctions: {
   updateTransitionTable: UpdateTransitionTable
   updateAcceptableStates: UpdateAcceptableStates
@@ -185,17 +216,6 @@ const createDetectNumberBranch = (updateFunctions: {
   updateTransitionTable(4, 6, DIGITS)
   updateTransitionTable(5, 6, DIGITS)
   updateTransitionTable(6, 6, DIGITS)
-
-  const alphabetMinusDigitsEeAndDot = ALPHABET.replace(
-    /[0123456789Ee. \n\t]*/gi,
-    ''
-  )
-  console.log(alphabetMinusDigitsEeAndDot)
-  updateTransitionTable(
-    1,
-    ERRORS.INTEGER_NUMBER.STATE_INDEX,
-    alphabetMinusDigitsEeAndDot
-  )
 
   updateAcceptableStates(1)
   updateAcceptableStates(3)
@@ -242,13 +262,6 @@ const createDetectNumberBranch = (updateFunctions: {
     classOfToken: 'NUM',
     canReadWhiteSpace: false,
     typeOfToken: 'REAL'
-  })
-  updateStatesInfo({
-    state: ERRORS.INTEGER_NUMBER.STATE_INDEX,
-    description: ERRORS.INTEGER_NUMBER.DESCRIPTION,
-    classOfToken: 'ERROR',
-    canReadWhiteSpace: false,
-    typeOfToken: 'NULO'
   })
 }
 
@@ -314,7 +327,7 @@ const createDetectCommentBranch = (updateFunctions: {
 
   const alphabetWithoutCurlyBrackets = ALPHABET.replace('{}', '')
   updateTransitionTable(0, 10, '{')
-  updateTransitionTable(10, 10, alphabetWithoutCurlyBrackets)
+  updateTransitionTable(10, 10, alphabetWithoutCurlyBrackets, 10)
   updateTransitionTable(10, 11, '}')
 
   updateAcceptableStates(11)
@@ -545,11 +558,23 @@ const {
   statesInfo: STATES_INFO
 } = createTransitionTable()
 
+const SPLITED_ALPHABET = ALPHABET.split('')
+SPLITED_ALPHABET.push('EOF')
+
 const Automata: Automata = {
   nextState(char, actualState) {
     const stateTransitionTable = TRANSITION_TABLE.get(actualState)
 
-    const nextState = stateTransitionTable?.get(char)
+    if (!stateTransitionTable) {
+      return -1
+    }
+
+    const { includeTransitions, outOfAlphabetTransitions } =
+      stateTransitionTable
+
+    if (!SPLITED_ALPHABET.includes(char)) return outOfAlphabetTransitions
+
+    const nextState = includeTransitions.get(char)
 
     return nextState ?? -1
   },
