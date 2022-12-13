@@ -728,7 +728,7 @@
 
 "@types/mock-fs@^4.13.1":
   version "4.13.1"
-  resolved "https://registry.npmjs.org/@types/mock-fs/-/mock-fs-4.13.1.tgz"
+  resolved "https://registry.yarnpkg.com/@types/mock-fs/-/mock-fs-4.13.1.tgz#9201554ceb23671badbfa8ac3f1fa9e0706305be"
   integrity sha512-m6nFAJ3lBSnqbvDZioawRvpLXSaPyn52Srf7OfzjubYbYX8MTUdIgDxQl0wEapm4m/pNYSd9TXocpQ0TvZFlYA==
   dependencies:
     "@types/node" "*"
