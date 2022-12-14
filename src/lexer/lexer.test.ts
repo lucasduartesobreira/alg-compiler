@@ -100,8 +100,7 @@ describe('Testing lexer', () => {
   test('code example', () => {
     const examples: Examples = [
       {
-        source: 
-`inicio
+        source: `inicio
   varinicio
     literal A;
     inteiro B, D, E;
@@ -903,10 +902,10 @@ describe('Testing lexer', () => {
     testExamples(examples)
   })
 
-  test("generate a error token with all chars that aren't in the alphabet", () => {
+  test("generate a error token when find a char that isn't in the alphabet", () => {
     const examples: Examples = [
       {
-        source: '123 abc &@¨',
+        source: '123 abc &@¨ abc@def',
         expectedTokens: [
           {
             classe: 'NUM',
@@ -929,6 +928,83 @@ describe('Testing lexer', () => {
             start: { line: 1, column: 9 },
             end: { line: 1, column: 11 },
             description: 'Erro caractere inválido, linha: 1 e coluna: 9'
+          },
+          {
+            classe: 'ERROR',
+            lexema: 'abc@def',
+            tipo: 'NULO',
+            start: { line: 1, column: 13 },
+            end: { line: 1, column: 19 },
+            description: 'Erro caractere inválido, linha: 1 e coluna: 13'
+          }
+        ]
+      }
+    ]
+
+    testExamples(examples)
+  })
+
+  test('generate a error token when the number pattern is mixed wrong', () => {
+    const examples: Examples = [
+      {
+        source:
+          '123abcd 123.abcd 123.0abcd 123.0E-abcd 123.0E-1abcd 123.0e-abcd 123.0e-1abcd',
+        expectedTokens: [
+          {
+            classe: 'ERROR',
+            lexema: '123abcd',
+            tipo: 'NULO',
+            start: { line: 1, column: 1 },
+            end: { line: 1, column: 7 },
+            description: 'Erro caractere inesperado, linha: 1 e coluna: 1'
+          },
+          {
+            classe: 'ERROR',
+            lexema: '123.abcd',
+            tipo: 'NULO',
+            start: { line: 1, column: 9 },
+            end: { line: 1, column: 16 },
+            description: 'Erro caractere inesperado, linha: 1 e coluna: 9'
+          },
+          {
+            classe: 'ERROR',
+            lexema: '123.0abcd',
+            tipo: 'NULO',
+            start: { line: 1, column: 18 },
+            end: { line: 1, column: 26 },
+            description: 'Erro caractere inesperado, linha: 1 e coluna: 18'
+          },
+          {
+            classe: 'ERROR',
+            lexema: '123.0E-abcd',
+            tipo: 'NULO',
+            start: { line: 1, column: 28 },
+            end: { line: 1, column: 38 },
+            description: 'Erro caractere inesperado, linha: 1 e coluna: 28'
+          },
+          {
+            classe: 'ERROR',
+            lexema: '123.0E-1abcd',
+            tipo: 'NULO',
+            start: { line: 1, column: 40 },
+            end: { line: 1, column: 51 },
+            description: 'Erro caractere inesperado, linha: 1 e coluna: 40'
+          },
+          {
+            classe: 'ERROR',
+            lexema: '123.0e-abcd',
+            tipo: 'NULO',
+            start: { line: 1, column: 53 },
+            end: { line: 1, column: 63 },
+            description: 'Erro caractere inesperado, linha: 1 e coluna: 53'
+          },
+          {
+            classe: 'ERROR',
+            lexema: '123.0e-1abcd',
+            tipo: 'NULO',
+            start: { line: 1, column: 65 },
+            end: { line: 1, column: 76 },
+            description: 'Erro caractere inesperado, linha: 1 e coluna: 65'
           }
         ]
       }
