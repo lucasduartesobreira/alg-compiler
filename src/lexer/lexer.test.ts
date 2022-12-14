@@ -12,11 +12,11 @@ const testExamples = (setOfExamples: Examples) => {
   for (const example of setOfExamples) {
     mock({
       'path/with/content': {
-        'file.mgol': example.source
+        'file.alg': example.source
       }
     })
 
-    const reader = Reader('path/with/content/file.mgol')
+    const reader = Reader('path/with/content/file.alg')
     const lexer = Lexer(reader)
 
     for (const expectedToken of example.expectedTokens) {

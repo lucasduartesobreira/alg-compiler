@@ -132,7 +132,7 @@ const addTransition =
 
     if (includeTransitions.has(charOrString)) {
       throw new Error(
-        `Error trying to overwrite a transition on state: ${actualState} with char: ${charOrString}`
+        `Erro tentando sobrescrever a transição do estado: ${actualState} com o char: ${charOrString}`
       )
     }
 
@@ -153,7 +153,7 @@ const addAcceptableState =
   (acceptableStates: AcceptableStates) => (state: number) => {
     if (acceptableStates.has(state)) {
       throw new Error(
-        `Error trying to add the state: ${state} to acceptable state list`
+        `Erro ao tentar adicionar o estado: ${state} à lista de estados finais`
       )
     }
 
@@ -162,7 +162,9 @@ const addAcceptableState =
 
 const addStateInfo = (statesInfo: StatesInfo) => (info: StateInfo) => {
   if (statesInfo.has(info.state)) {
-    throw new Error(`Error trying to register info to the state: ${info.state}`)
+    throw new Error(
+      `Erro ao tentar registrar as informações do estado: ${info.state}`
+    )
   }
 
   statesInfo.set(info.state, info)

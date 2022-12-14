@@ -5,7 +5,7 @@ import { Reader, ReaderConstructor } from './file.types'
 const readFile = (path: string) => readFileSync(path, 'utf-8').split('')
 
 const Reader: ReaderConstructor = (pathString: string) => {
-  if (path.extname(pathString) != '.mgol') {
+  if (path.extname(pathString) != '.alg') {
     throw new Error(
       `Arquivo de extensão não reconhecido: ${path.extname(pathString)}`
     )
