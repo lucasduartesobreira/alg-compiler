@@ -1,6 +1,7 @@
 import {
   AcceptableStates,
   Automata,
+  State,
   StateInfo,
   StatesInfo,
   TransitionTable,
@@ -13,13 +14,10 @@ const EOF = 'EOF'
 const DIGITS = '0123456789'
 const LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 const ALPHABET =
-  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRTUVWXYZ ?!;:,.<>=/*+-\\(){}_||\'[]"'
+  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ \n\t?!;:,.<>=/*+-\\(){}_||\'[]"'
+const CLOSE_TOKEN_CHARS = ' \n\t;,*+-/()><-{"'
 
 const ERRORS = {
-  INTEGER_NUMBER: {
-    STATE_INDEX: -2,
-    DESCRIPTION: 'Erro token fora do padrão'
-  },
   REAL_NUMBER: {
     STATE_INDEX: 2,
     DESCRIPTION: 'Erro número real incompleto'
@@ -41,12 +39,16 @@ const ERRORS = {
     DESCRIPTION: 'Erro commentário incompleto'
   },
   INVALID_CHARACTER: {
-    STATE_INDEX: -3,
-    DESCRIPTION: 'Erro caractere inválido na linguágem'
+    STATE_INDEX: 100,
+    DESCRIPTION: 'Erro caractere inválido'
   },
   INVALID_PATTERN: {
     STATE_INDEX: 0,
     DESCRIPTION: 'Erro token fora do padrão'
+  },
+  UNEXPECTED_CHARACTER: {
+    STATE_INDEX: 101,
+    DESCRIPTION: 'Erro caractere inesperado'
   }
 }
 
@@ -64,7 +66,11 @@ const createTransitionTable = () => {
     updateStatesInfo
   }
 
-  createSkipWhiteSpaceOnStart(updateFunctions)
+  createSkipWhitespaceOnStart(updateFunctions)
+
+  createInvalidCharacterState(updateFunctions)
+
+  createUnexpectedCharacterState(updateFunctions)
 
   createDetectNumberBranch(updateFunctions)
 
@@ -96,14 +102,25 @@ const createTransitionTable = () => {
 const addTransition =
   (transitionTable: TransitionTable) =>
   (
-    actualState: number,
-    nextState: number,
-    charOrString: string
+    actualState: State,
+    nextState: State,
+    charOrString: string,
+    options?: {
+      outOfAlphabetTransitions?: State
+      defaultTransition?: State
+    }
   ): TransitionTable => {
     const stateTransitionTable = transitionTable.get(actualState)
 
     if (!stateTransitionTable) {
-      transitionTable.set(actualState, new Map())
+      const { outOfAlphabetTransitions, defaultTransition } = options ?? {}
+
+      transitionTable.set(actualState, {
+        includeTransitions: new Map(),
+        outOfAlphabetTransitions:
+          outOfAlphabetTransitions ?? ERRORS.INVALID_CHARACTER.STATE_INDEX,
+        defaultTransition: defaultTransition ?? -1
+      })
       return addTransition(transitionTable)(
         actualState,
         nextState,
@@ -111,18 +128,20 @@ const addTransition =
       )
     }
 
-    if (stateTransitionTable.has(charOrString)) {
+    const { includeTransitions } = stateTransitionTable
+
+    if (includeTransitions.has(charOrString)) {
       throw new Error(
-        `Error trying to overwrite a transition on state: ${actualState} with char: ${charOrString}`
+        `Erro tentando sobrescrever a transição do estado: ${actualState} com o char: ${charOrString}`
       )
     }
 
     if (charOrString !== EOF) {
       for (const char of charOrString) {
-        stateTransitionTable.set(char, nextState)
+        includeTransitions.set(char, nextState)
       }
     } else {
-      stateTransitionTable.set(EOF, nextState)
+      includeTransitions.set(EOF, nextState)
     }
 
     transitionTable.set(actualState, stateTransitionTable)
@@ -134,7 +153,7 @@ const addAcceptableState =
   (acceptableStates: AcceptableStates) => (state: number) => {
     if (acceptableStates.has(state)) {
       throw new Error(
-        `Error trying to add the state: ${state} to acceptable state list`
+        `Erro ao tentar adicionar o estado: ${state} à lista de estados finais`
       )
     }
 
@@ -143,13 +162,15 @@ const addAcceptableState =
 
 const addStateInfo = (statesInfo: StatesInfo) => (info: StateInfo) => {
   if (statesInfo.has(info.state)) {
-    throw new Error(`Error trying to register info to the state: ${info.state}`)
+    throw new Error(
+      `Erro ao tentar registrar as informações do estado: ${info.state}`
+    )
   }
 
   statesInfo.set(info.state, info)
 }
 
-const createSkipWhiteSpaceOnStart = (updateFunctions: {
+const createSkipWhitespaceOnStart = (updateFunctions: {
   updateTransitionTable: UpdateTransitionTable
   updateAcceptableStates: UpdateAcceptableStates
   updateStatesInfo: UpdateStatesInfo
@@ -160,8 +181,66 @@ const createSkipWhiteSpaceOnStart = (updateFunctions: {
 
   updateStatesInfo({
     state: ERRORS.INVALID_PATTERN.STATE_INDEX,
-    typeofToken: 'ERROR',
+    classOfToken: 'ERROR',
     description: ERRORS.INVALID_PATTERN.DESCRIPTION,
+    typeOfToken: 'NULO',
+    canReadWhiteSpace: false
+  })
+}
+
+const createInvalidCharacterState = (updateFunctions: {
+  updateTransitionTable: UpdateTransitionTable
+  updateAcceptableStates: UpdateAcceptableStates
+  updateStatesInfo: UpdateStatesInfo
+}) => {
+  const { updateStatesInfo, updateTransitionTable } = updateFunctions
+
+  const invalidCharStateIndex = ERRORS.INVALID_CHARACTER.STATE_INDEX
+
+  updateTransitionTable(invalidCharStateIndex, invalidCharStateIndex, '', {
+    outOfAlphabetTransitions: invalidCharStateIndex,
+    defaultTransition: invalidCharStateIndex
+  })
+
+  updateTransitionTable(invalidCharStateIndex, -1, ' \n\t')
+  updateTransitionTable(invalidCharStateIndex, -1, 'EOF')
+
+  updateStatesInfo({
+    state: ERRORS.INVALID_CHARACTER.STATE_INDEX,
+    classOfToken: 'ERROR',
+    description: ERRORS.INVALID_CHARACTER.DESCRIPTION,
+    typeOfToken: 'NULO',
+    canReadWhiteSpace: false
+  })
+}
+
+const createUnexpectedCharacterState = (updateFunctions: {
+  updateTransitionTable: UpdateTransitionTable
+  updateAcceptableStates: UpdateAcceptableStates
+  updateStatesInfo: UpdateStatesInfo
+}) => {
+  const { updateStatesInfo, updateTransitionTable } = updateFunctions
+
+  const unexpectedCharStateIndex = ERRORS.UNEXPECTED_CHARACTER.STATE_INDEX
+
+  updateTransitionTable(
+    unexpectedCharStateIndex,
+    unexpectedCharStateIndex,
+    '',
+    {
+      outOfAlphabetTransitions: unexpectedCharStateIndex,
+      defaultTransition: unexpectedCharStateIndex
+    }
+  )
+
+  updateTransitionTable(unexpectedCharStateIndex, -1, ' \n\t')
+  updateTransitionTable(unexpectedCharStateIndex, -1, 'EOF')
+
+  updateStatesInfo({
+    state: ERRORS.UNEXPECTED_CHARACTER.STATE_INDEX,
+    classOfToken: 'ERROR',
+    description: ERRORS.UNEXPECTED_CHARACTER.DESCRIPTION,
+    typeOfToken: 'NULO',
     canReadWhiteSpace: false
   })
 }
@@ -173,28 +252,24 @@ const createDetectNumberBranch = (updateFunctions: {
 }) => {
   const { updateStatesInfo, updateAcceptableStates, updateTransitionTable } =
     updateFunctions
+  const numberBranchOptions = {
+    defaultTransition: ERRORS.UNEXPECTED_CHARACTER.STATE_INDEX
+  }
+
   updateTransitionTable(0, 1, DIGITS)
-  updateTransitionTable(1, 1, DIGITS)
+  updateTransitionTable(1, 1, DIGITS, numberBranchOptions)
+  updateTransitionTable(1, -1, CLOSE_TOKEN_CHARS)
   updateTransitionTable(1, 2, '.')
-  updateTransitionTable(2, 3, DIGITS)
-  updateTransitionTable(3, 3, DIGITS)
+  updateTransitionTable(2, 3, DIGITS, numberBranchOptions)
+  updateTransitionTable(3, 3, DIGITS, numberBranchOptions)
+  updateTransitionTable(3, -1, CLOSE_TOKEN_CHARS)
   updateTransitionTable(1, 4, 'Ee')
   updateTransitionTable(3, 4, 'Ee')
-  updateTransitionTable(4, 5, '+-')
+  updateTransitionTable(4, 5, '+-', numberBranchOptions)
   updateTransitionTable(4, 6, DIGITS)
-  updateTransitionTable(5, 6, DIGITS)
-  updateTransitionTable(6, 6, DIGITS)
-
-  const alphabetMinusDigitsEeAndDot = ALPHABET.replace(
-    /[0123456789Ee. \n\t]*/gi,
-    ''
-  )
-  console.log(alphabetMinusDigitsEeAndDot)
-  updateTransitionTable(
-    1,
-    ERRORS.INTEGER_NUMBER.STATE_INDEX,
-    alphabetMinusDigitsEeAndDot
-  )
+  updateTransitionTable(5, 6, DIGITS, numberBranchOptions)
+  updateTransitionTable(6, 6, DIGITS, numberBranchOptions)
+  updateTransitionTable(6, -1, CLOSE_TOKEN_CHARS)
 
   updateAcceptableStates(1)
   updateAcceptableStates(3)
@@ -203,44 +278,44 @@ const createDetectNumberBranch = (updateFunctions: {
   updateStatesInfo({
     state: 1,
     description: 'Número inteiro',
-    typeofToken: 'NUM',
-    canReadWhiteSpace: false
+    classOfToken: 'NUM',
+    canReadWhiteSpace: false,
+    typeOfToken: 'INTEIRO'
   })
   updateStatesInfo({
     state: ERRORS.REAL_NUMBER.STATE_INDEX,
     description: ERRORS.REAL_NUMBER.DESCRIPTION,
-    typeofToken: 'ERROR',
-    canReadWhiteSpace: false
+    classOfToken: 'ERROR',
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: 3,
     description: 'Número real',
-    typeofToken: 'NUM',
-    canReadWhiteSpace: false
+    classOfToken: 'NUM',
+    canReadWhiteSpace: false,
+    typeOfToken: 'REAL'
   })
   updateStatesInfo({
     state: ERRORS.EXPONENCIAL_NUMBER.STATE_INDEX,
     description: ERRORS.EXPONENCIAL_NUMBER.DESCRIPTION,
-    typeofToken: 'ERROR',
-    canReadWhiteSpace: false
+    classOfToken: 'ERROR',
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: ERRORS.EXPONENCIAL_NUMBER_WITH_SIGN.STATE_INDEX,
     description: ERRORS.EXPONENCIAL_NUMBER_WITH_SIGN.DESCRIPTION,
-    typeofToken: 'ERROR',
-    canReadWhiteSpace: false
+    classOfToken: 'ERROR',
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: 6,
     description: 'Número exponencial',
-    typeofToken: 'NUM',
-    canReadWhiteSpace: false
-  })
-  updateStatesInfo({
-    state: ERRORS.INTEGER_NUMBER.STATE_INDEX,
-    description: ERRORS.INTEGER_NUMBER.DESCRIPTION,
-    typeofToken: 'ERROR',
-    canReadWhiteSpace: false
+    classOfToken: 'NUM',
+    canReadWhiteSpace: false,
+    typeOfToken: 'REAL'
   })
 }
 
@@ -253,23 +328,27 @@ const createDetectLiteralBranch = (updateFunctions: {
     updateFunctions
   const alphabetWithoutQuotes = ALPHABET.replace('"', '')
   updateTransitionTable(0, 7, '"')
-  updateTransitionTable(7, 7, alphabetWithoutQuotes)
+  updateTransitionTable(7, 7, alphabetWithoutQuotes, {
+    outOfAlphabetTransitions: 7
+  })
   updateTransitionTable(7, 8, '"')
 
   updateAcceptableStates(8)
 
   updateStatesInfo({
     state: 7,
-    typeofToken: 'ERROR',
+    classOfToken: 'ERROR',
     description: 'Erro literal incompleto',
-    canReadWhiteSpace: true
+    canReadWhiteSpace: true,
+    typeOfToken: 'NULO'
   })
 
   updateStatesInfo({
     state: 8,
-    typeofToken: 'LIT',
+    classOfToken: 'LIT',
     description: 'Literal',
-    canReadWhiteSpace: false
+    canReadWhiteSpace: false,
+    typeOfToken: 'LITERAL'
   })
 }
 
@@ -288,8 +367,9 @@ const createDetectIdBranch = (updateFunctions: {
   updateStatesInfo({
     state: 9,
     description: 'Identifier',
-    typeofToken: 'ID',
-    canReadWhiteSpace: false
+    classOfToken: 'ID',
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
 }
 
@@ -303,22 +383,26 @@ const createDetectCommentBranch = (updateFunctions: {
 
   const alphabetWithoutCurlyBrackets = ALPHABET.replace('{}', '')
   updateTransitionTable(0, 10, '{')
-  updateTransitionTable(10, 10, alphabetWithoutCurlyBrackets)
+  updateTransitionTable(10, 10, alphabetWithoutCurlyBrackets, {
+    outOfAlphabetTransitions: 10
+  })
   updateTransitionTable(10, 11, '}')
 
   updateAcceptableStates(11)
 
   updateStatesInfo({
     state: 10,
-    typeofToken: 'ERROR',
+    classOfToken: 'ERROR',
     description: 'Erro comentário incompleto',
-    canReadWhiteSpace: true
+    canReadWhiteSpace: true,
+    typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: 11,
     description: 'Commentary',
-    typeofToken: 'COMMENT',
-    canReadWhiteSpace: false
+    classOfToken: 'COMMENT',
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
 }
 
@@ -344,33 +428,38 @@ const createDetectOPRBranch = (updateFunctions: {
 
   updateStatesInfo({
     state: 13,
-    typeofToken: 'OPR',
+    classOfToken: 'OPR',
     description: '>',
-    canReadWhiteSpace: false
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: 14,
-    typeofToken: 'OPR',
+    classOfToken: 'OPR',
     description: '>=',
-    canReadWhiteSpace: false
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: 15,
-    typeofToken: 'OPR',
+    classOfToken: 'OPR',
     description: '<',
-    canReadWhiteSpace: false
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: 16,
-    typeofToken: 'OPR',
+    classOfToken: 'OPR',
     description: '<=',
-    canReadWhiteSpace: false
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: 18,
-    typeofToken: 'OPR',
+    classOfToken: 'OPR',
     description: '<>',
-    canReadWhiteSpace: false
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
 }
 
@@ -388,9 +477,10 @@ const createDetectATRBranch = (updateFunctions: {
 
   updateStatesInfo({
     state: 17,
-    typeofToken: 'ATR',
+    classOfToken: 'ATR',
     description: '<-',
-    canReadWhiteSpace: false
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
 }
 
@@ -408,9 +498,10 @@ const createDetectOPABranch = (updateFunctions: {
 
   updateStatesInfo({
     state: 19,
-    typeofToken: 'OPA',
+    classOfToken: 'OPA',
     description: 'Arithmetic Operator',
-    canReadWhiteSpace: false
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
 }
 
@@ -428,9 +519,10 @@ const createDetectAB_PBranch = (updateFunctions: {
 
   updateStatesInfo({
     state: 20,
-    typeofToken: 'AB_P',
+    classOfToken: 'AB_P',
     description: '(',
-    canReadWhiteSpace: false
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
 }
 
@@ -448,9 +540,10 @@ const createDetectFC_PBranch = (updateFunctions: {
 
   updateStatesInfo({
     state: 21,
-    typeofToken: 'FC_P',
+    classOfToken: 'FC_P',
     description: ')',
-    canReadWhiteSpace: false
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
 }
 
@@ -468,9 +561,10 @@ const createDetectPT_VBranch = (updateFunctions: {
 
   updateStatesInfo({
     state: 22,
-    typeofToken: 'PT_V',
+    classOfToken: 'PT_V',
     description: ';',
-    canReadWhiteSpace: false
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
 }
 
@@ -488,9 +582,10 @@ const createDetectVIRBranch = (updateFunctions: {
 
   updateStatesInfo({
     state: 23,
-    typeofToken: 'VIR',
+    classOfToken: 'VIR',
     description: ',',
-    canReadWhiteSpace: false
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
 }
 
@@ -508,9 +603,10 @@ const createDetectEOFBranch = (updateFunctions: {
 
   updateStatesInfo({
     state: 12,
-    typeofToken: 'EOF',
+    classOfToken: 'EOF',
     description: 'End of file',
-    canReadWhiteSpace: false
+    canReadWhiteSpace: false,
+    typeOfToken: 'NULO'
   })
 }
 
@@ -520,13 +616,25 @@ const {
   statesInfo: STATES_INFO
 } = createTransitionTable()
 
+const SPLITED_ALPHABET = ALPHABET.split('')
+SPLITED_ALPHABET.push('EOF')
+
 const Automata: Automata = {
   nextState(char, actualState) {
     const stateTransitionTable = TRANSITION_TABLE.get(actualState)
 
-    const nextState = stateTransitionTable?.get(char)
+    if (!stateTransitionTable) {
+      return -1
+    }
 
-    return nextState ?? -1
+    const { includeTransitions, outOfAlphabetTransitions, defaultTransition } =
+      stateTransitionTable
+
+    if (!SPLITED_ALPHABET.includes(char)) return outOfAlphabetTransitions
+
+    const nextState = includeTransitions.get(char)
+
+    return nextState ?? defaultTransition
   },
   acceptState(state) {
     const accepted = ACCEPTABLE_STATES.has(state)

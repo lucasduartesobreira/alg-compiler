@@ -8,8 +8,8 @@ beforeEach(function () {
   mock({
     'path/with/content': {
       'file.txt': 'wrong extension',
-      'content.mgol': content,
-      'content_with_break_line.mgol': contentWithBreak
+      'content.alg': content,
+      'content_with_break_line.alg': contentWithBreak
     }
   })
 })
@@ -24,14 +24,14 @@ describe('Testing Reader', () => {
   })
 
   test('read content', () => {
-    const reader = Reader('path/with/content/content.mgol')
+    const reader = Reader('path/with/content/content.alg')
     const response = { char: 'c', charNumber: 0, column: 1, line: 1 }
 
     expect(reader.nextChar()).toEqual(response)
   })
 
   test('read sequential nextChar', () => {
-    const reader = Reader('path/with/content/content.mgol')
+    const reader = Reader('path/with/content/content.alg')
     const response = { char: 'c', charNumber: 0, column: 1, line: 1 }
     const secondResponse = { char: 'o', charNumber: 1, column: 2, line: 1 }
     const thirdResponse = { char: 'n', charNumber: 2, column: 3, line: 1 }
@@ -42,7 +42,7 @@ describe('Testing Reader', () => {
   })
 
   test('should return EOF', () => {
-    const reader = Reader('path/with/content/content.mgol')
+    const reader = Reader('path/with/content/content.alg')
     const response = { char: 'EOF', charNumber: 6, column: 7, line: 1 }
 
     for (let i = 0; i < content.length; i++) {
@@ -53,7 +53,7 @@ describe('Testing Reader', () => {
   })
 
   test('should return break line and column', () => {
-    const reader = Reader('path/with/content/content_with_break_line.mgol')
+    const reader = Reader('path/with/content/content_with_break_line.alg')
     const response = { char: '\n', charNumber: 7, column: 8, line: 1 }
 
     for (let i = 0; i < content.length; i++) {

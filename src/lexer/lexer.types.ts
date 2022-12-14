@@ -1,17 +1,34 @@
 import { Reader } from '@/lexer/file.types'
-import { TypeofToken } from './automata.types'
+import { TokenType, TypeofToken } from './automata.types'
+
+type Lexema = string
+type ReservedWords =
+  | 'se'
+  | 'inicio'
+  | 'varinicio'
+  | 'varfim'
+  | 'escreva'
+  | 'leia'
+  | 'entao'
+  | 'fimse'
+  | 'fim'
+  | 'inteiro'
+  | 'literal'
+  | 'real'
 
 type Token = {
-  type: TypeofToken
-  details: string
-  start: number
-  end: number
+  classe: TypeofToken | ReservedWords
+  lexema: string
+  tipo: TokenType | ReservedWords
+  start: { line: number; column: number }
+  end: { line: number; column: number }
+  description?: string
 }
 
 type Lexer = {
-  nextToken(): Token
+  scanner(): Token
 }
 
 type LexerConstructor = (reader: Reader) => Lexer
 
-export { Lexer, LexerConstructor }
+export { Lexer, LexerConstructor, Lexema, Token, ReservedWords }

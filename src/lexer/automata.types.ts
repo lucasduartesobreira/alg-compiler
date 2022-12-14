@@ -1,5 +1,3 @@
-import { Either } from '@/utils/types'
-
 type State = number
 type Char = string
 
@@ -8,7 +6,7 @@ type Automata = {
   acceptState(state: number): { accepted: boolean; stateInfo: StateInfo }
 }
 
-type TypeofToken =
+type ClassOfToken =
   | 'NUM'
   | 'LIT'
   | 'ID'
@@ -23,19 +21,30 @@ type TypeofToken =
   | 'VIR'
   | 'ERROR'
 
+type TokenType = 'INTEIRO' | 'LITERAL' | 'REAL' | 'NULO'
+
 type StateInfo = {
   state: State
   description: string
-  typeofToken: TypeofToken
+  typeOfToken: TokenType
+  classOfToken: ClassOfToken
   canReadWhiteSpace: boolean
 }
 
 type StateTransitions = Map<Char, number>
-type TransitionTable = Map<State, StateTransitions>
+type TransitionTable = Map<
+  State,
+  {
+    includeTransitions: StateTransitions
+    outOfAlphabetTransitions: State
+    defaultTransition: State
+  }
+>
 type UpdateTransitionTable = (
   actualState: State,
   nextState: State,
-  charOrString: string
+  charOrString: string,
+  options?: { outOfAlphabetTransitions?: State; defaultTransition?: State }
 ) => void
 
 type AcceptableStates = Map<State, void>
@@ -46,12 +55,14 @@ type UpdateStatesInfo = (info: StateInfo) => void
 
 export {
   Automata,
-  TypeofToken,
+  ClassOfToken as TypeofToken,
   TransitionTable,
   AcceptableStates,
   StateInfo,
   StatesInfo,
   UpdateTransitionTable,
   UpdateAcceptableStates,
-  UpdateStatesInfo
+  UpdateStatesInfo,
+  State,
+  TokenType
 }
