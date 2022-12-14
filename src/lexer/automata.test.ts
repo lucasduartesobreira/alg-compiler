@@ -3608,7 +3608,7 @@ describe('Testing automata', () => {
         expectedToBeAccepted: false
       },
       {
-        stringToTest: '"abcdefaskdhfj aalsdjkfh &/?,.;12340981905823asdhbvc ',
+        stringToTest: '@&¨a',
         stateInfoExpected: {
           classOfToken: 'ERROR',
           description: 'Erro caractere inválido',
@@ -3617,10 +3617,28 @@ describe('Testing automata', () => {
         expectedToBeAccepted: false
       },
       {
-        stringToTest: '@&¨',
+        stringToTest: 'abcd@abcd',
         stateInfoExpected: {
           classOfToken: 'ERROR',
           description: 'Erro caractere inválido',
+          typeOfToken: 'NULO'
+        },
+        expectedToBeAccepted: false
+      },
+      {
+        stringToTest: '123abcd',
+        stateInfoExpected: {
+          classOfToken: 'ERROR',
+          description: 'Erro caractere inesperado',
+          typeOfToken: 'NULO'
+        },
+        expectedToBeAccepted: false
+      },
+      {
+        stringToTest: '123.abcd',
+        stateInfoExpected: {
+          classOfToken: 'ERROR',
+          description: 'Erro caractere inesperado',
           typeOfToken: 'NULO'
         },
         expectedToBeAccepted: false

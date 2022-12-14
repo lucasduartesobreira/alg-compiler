@@ -15,6 +15,7 @@ const DIGITS = '0123456789'
 const LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 const ALPHABET =
   '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ \n\t?!;:,.<>=/*+-\\(){}_||\'[]"'
+const CLOSE_TOKEN_CHARS = ' \n\t;,*+-/()><-{"'
 
 const ERRORS = {
   REAL_NUMBER: {
@@ -38,12 +39,16 @@ const ERRORS = {
     DESCRIPTION: 'Erro commentário incompleto'
   },
   INVALID_CHARACTER: {
-    STATE_INDEX: -3,
+    STATE_INDEX: 100,
     DESCRIPTION: 'Erro caractere inválido'
   },
   INVALID_PATTERN: {
     STATE_INDEX: 0,
     DESCRIPTION: 'Erro token fora do padrão'
+  },
+  UNEXPECTED_CHARACTER: {
+    STATE_INDEX: 101,
+    DESCRIPTION: 'Erro caractere inesperado'
   }
 }
 
@@ -61,9 +66,11 @@ const createTransitionTable = () => {
     updateStatesInfo
   }
 
-  createSkipWhiteSpaceOnStart(updateFunctions)
+  createSkipWhitespaceOnStart(updateFunctions)
 
-  createInvalidCharacter(updateFunctions)
+  createInvalidCharacterState(updateFunctions)
+
+  createUnexpectedCharacterState(updateFunctions)
 
   createDetectNumberBranch(updateFunctions)
 
@@ -98,15 +105,21 @@ const addTransition =
     actualState: State,
     nextState: State,
     charOrString: string,
-    outOfAlphabetTransitions?: State
+    options?: {
+      outOfAlphabetTransitions?: State
+      defaultTransition?: State
+    }
   ): TransitionTable => {
     const stateTransitionTable = transitionTable.get(actualState)
 
     if (!stateTransitionTable) {
+      const { outOfAlphabetTransitions, defaultTransition } = options ?? {}
+
       transitionTable.set(actualState, {
         includeTransitions: new Map(),
         outOfAlphabetTransitions:
-          outOfAlphabetTransitions ?? ERRORS.INVALID_CHARACTER.STATE_INDEX
+          outOfAlphabetTransitions ?? ERRORS.INVALID_CHARACTER.STATE_INDEX,
+        defaultTransition: defaultTransition ?? -1
       })
       return addTransition(transitionTable)(
         actualState,
@@ -155,7 +168,7 @@ const addStateInfo = (statesInfo: StatesInfo) => (info: StateInfo) => {
   statesInfo.set(info.state, info)
 }
 
-const createSkipWhiteSpaceOnStart = (updateFunctions: {
+const createSkipWhitespaceOnStart = (updateFunctions: {
   updateTransitionTable: UpdateTransitionTable
   updateAcceptableStates: UpdateAcceptableStates
   updateStatesInfo: UpdateStatesInfo
@@ -173,7 +186,7 @@ const createSkipWhiteSpaceOnStart = (updateFunctions: {
   })
 }
 
-const createInvalidCharacter = (updateFunctions: {
+const createInvalidCharacterState = (updateFunctions: {
   updateTransitionTable: UpdateTransitionTable
   updateAcceptableStates: UpdateAcceptableStates
   updateStatesInfo: UpdateStatesInfo
@@ -182,17 +195,49 @@ const createInvalidCharacter = (updateFunctions: {
 
   const invalidCharStateIndex = ERRORS.INVALID_CHARACTER.STATE_INDEX
 
-  updateTransitionTable(
-    invalidCharStateIndex,
-    invalidCharStateIndex,
-    '',
-    invalidCharStateIndex
-  )
+  updateTransitionTable(invalidCharStateIndex, invalidCharStateIndex, '', {
+    outOfAlphabetTransitions: invalidCharStateIndex,
+    defaultTransition: invalidCharStateIndex
+  })
+
+  updateTransitionTable(invalidCharStateIndex, -1, ' \n\t')
+  updateTransitionTable(invalidCharStateIndex, -1, 'EOF')
 
   updateStatesInfo({
     state: ERRORS.INVALID_CHARACTER.STATE_INDEX,
     classOfToken: 'ERROR',
     description: ERRORS.INVALID_CHARACTER.DESCRIPTION,
+    typeOfToken: 'NULO',
+    canReadWhiteSpace: false
+  })
+}
+
+const createUnexpectedCharacterState = (updateFunctions: {
+  updateTransitionTable: UpdateTransitionTable
+  updateAcceptableStates: UpdateAcceptableStates
+  updateStatesInfo: UpdateStatesInfo
+}) => {
+  const { updateStatesInfo, updateTransitionTable } = updateFunctions
+
+  const unexpectedCharStateIndex = ERRORS.UNEXPECTED_CHARACTER.STATE_INDEX
+
+  updateTransitionTable(
+    unexpectedCharStateIndex,
+    unexpectedCharStateIndex,
+    '',
+    {
+      outOfAlphabetTransitions: unexpectedCharStateIndex,
+      defaultTransition: unexpectedCharStateIndex
+    }
+  )
+
+  updateTransitionTable(unexpectedCharStateIndex, -1, ' \n\t')
+  updateTransitionTable(unexpectedCharStateIndex, -1, 'EOF')
+
+  updateStatesInfo({
+    state: ERRORS.UNEXPECTED_CHARACTER.STATE_INDEX,
+    classOfToken: 'ERROR',
+    description: ERRORS.UNEXPECTED_CHARACTER.DESCRIPTION,
     typeOfToken: 'NULO',
     canReadWhiteSpace: false
   })
@@ -205,17 +250,24 @@ const createDetectNumberBranch = (updateFunctions: {
 }) => {
   const { updateStatesInfo, updateAcceptableStates, updateTransitionTable } =
     updateFunctions
+  const numberBranchOptions = {
+    defaultTransition: ERRORS.UNEXPECTED_CHARACTER.STATE_INDEX
+  }
+
   updateTransitionTable(0, 1, DIGITS)
-  updateTransitionTable(1, 1, DIGITS)
+  updateTransitionTable(1, 1, DIGITS, numberBranchOptions)
+  updateTransitionTable(1, -1, CLOSE_TOKEN_CHARS)
   updateTransitionTable(1, 2, '.')
-  updateTransitionTable(2, 3, DIGITS)
-  updateTransitionTable(3, 3, DIGITS)
+  updateTransitionTable(2, 3, DIGITS, numberBranchOptions)
+  updateTransitionTable(3, 3, DIGITS, numberBranchOptions)
+  updateTransitionTable(3, -1, CLOSE_TOKEN_CHARS)
   updateTransitionTable(1, 4, 'Ee')
   updateTransitionTable(3, 4, 'Ee')
-  updateTransitionTable(4, 5, '+-')
+  updateTransitionTable(4, 5, '+-', numberBranchOptions)
   updateTransitionTable(4, 6, DIGITS)
-  updateTransitionTable(5, 6, DIGITS)
-  updateTransitionTable(6, 6, DIGITS)
+  updateTransitionTable(5, 6, DIGITS, numberBranchOptions)
+  updateTransitionTable(6, 6, DIGITS, numberBranchOptions)
+  updateTransitionTable(6, -1, CLOSE_TOKEN_CHARS)
 
   updateAcceptableStates(1)
   updateAcceptableStates(3)
@@ -274,7 +326,9 @@ const createDetectLiteralBranch = (updateFunctions: {
     updateFunctions
   const alphabetWithoutQuotes = ALPHABET.replace('"', '')
   updateTransitionTable(0, 7, '"')
-  updateTransitionTable(7, 7, alphabetWithoutQuotes)
+  updateTransitionTable(7, 7, alphabetWithoutQuotes, {
+    outOfAlphabetTransitions: 7
+  })
   updateTransitionTable(7, 8, '"')
 
   updateAcceptableStates(8)
@@ -327,7 +381,9 @@ const createDetectCommentBranch = (updateFunctions: {
 
   const alphabetWithoutCurlyBrackets = ALPHABET.replace('{}', '')
   updateTransitionTable(0, 10, '{')
-  updateTransitionTable(10, 10, alphabetWithoutCurlyBrackets, 10)
+  updateTransitionTable(10, 10, alphabetWithoutCurlyBrackets, {
+    outOfAlphabetTransitions: 10
+  })
   updateTransitionTable(10, 11, '}')
 
   updateAcceptableStates(11)
@@ -569,14 +625,14 @@ const Automata: Automata = {
       return -1
     }
 
-    const { includeTransitions, outOfAlphabetTransitions } =
+    const { includeTransitions, outOfAlphabetTransitions, defaultTransition } =
       stateTransitionTable
 
     if (!SPLITED_ALPHABET.includes(char)) return outOfAlphabetTransitions
 
     const nextState = includeTransitions.get(char)
 
-    return nextState ?? -1
+    return nextState ?? defaultTransition
   },
   acceptState(state) {
     const accepted = ACCEPTABLE_STATES.has(state)

@@ -34,13 +34,17 @@ type StateInfo = {
 type StateTransitions = Map<Char, number>
 type TransitionTable = Map<
   State,
-  { includeTransitions: StateTransitions; outOfAlphabetTransitions: State }
+  {
+    includeTransitions: StateTransitions
+    outOfAlphabetTransitions: State
+    defaultTransition: State
+  }
 >
 type UpdateTransitionTable = (
   actualState: State,
   nextState: State,
   charOrString: string,
-  outOfAlphabetTransitions?: State
+  options?: { outOfAlphabetTransitions?: State; defaultTransition?: State }
 ) => void
 
 type AcceptableStates = Map<State, void>
