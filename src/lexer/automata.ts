@@ -202,7 +202,7 @@ const createInvalidCharacterState = (updateFunctions: {
     defaultTransition: invalidCharStateIndex
   })
 
-  updateTransitionTable(invalidCharStateIndex, -1, ' \n\t')
+  updateTransitionTable(invalidCharStateIndex, -1, CLOSE_TOKEN_CHARS)
   updateTransitionTable(invalidCharStateIndex, -1, 'EOF')
 
   updateStatesInfo({
@@ -233,7 +233,7 @@ const createUnexpectedCharacterState = (updateFunctions: {
     }
   )
 
-  updateTransitionTable(unexpectedCharStateIndex, -1, ' \n\t')
+  updateTransitionTable(unexpectedCharStateIndex, -1, CLOSE_TOKEN_CHARS)
   updateTransitionTable(unexpectedCharStateIndex, -1, 'EOF')
 
   updateStatesInfo({
