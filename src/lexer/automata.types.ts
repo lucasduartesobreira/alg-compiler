@@ -28,7 +28,6 @@ type StateInfo = {
   description: string
   typeOfToken: TokenType
   classOfToken: ClassOfToken
-  canReadWhiteSpace: boolean
 }
 
 type StateTransitions = Map<Char, number>

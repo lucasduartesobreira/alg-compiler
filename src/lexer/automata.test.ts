@@ -1,7 +1,7 @@
 import Automata from './automata'
 import { StateInfo, TypeofToken } from './automata.types'
 
-type ExpectedStateInfo = Omit<StateInfo, 'state' | 'canReadWhiteSpace'>
+type ExpectedStateInfo = Omit<StateInfo, 'state'>
 type ExamplesToTest = Array<{
   stringToTest: string
   stateInfoExpected: ExpectedStateInfo

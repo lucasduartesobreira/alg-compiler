@@ -183,8 +183,7 @@ const createSkipWhitespaceOnStart = (updateFunctions: {
     state: ERRORS.INVALID_PATTERN.STATE_INDEX,
     classOfToken: 'ERROR',
     description: ERRORS.INVALID_PATTERN.DESCRIPTION,
-    typeOfToken: 'NULO',
-    canReadWhiteSpace: false
+    typeOfToken: 'NULO'
   })
 }
 
@@ -209,8 +208,7 @@ const createInvalidCharacterState = (updateFunctions: {
     state: ERRORS.INVALID_CHARACTER.STATE_INDEX,
     classOfToken: 'ERROR',
     description: ERRORS.INVALID_CHARACTER.DESCRIPTION,
-    typeOfToken: 'NULO',
-    canReadWhiteSpace: false
+    typeOfToken: 'NULO'
   })
 }
 
@@ -240,8 +238,7 @@ const createUnexpectedCharacterState = (updateFunctions: {
     state: ERRORS.UNEXPECTED_CHARACTER.STATE_INDEX,
     classOfToken: 'ERROR',
     description: ERRORS.UNEXPECTED_CHARACTER.DESCRIPTION,
-    typeOfToken: 'NULO',
-    canReadWhiteSpace: false
+    typeOfToken: 'NULO'
   })
 }
 
@@ -279,42 +276,36 @@ const createDetectNumberBranch = (updateFunctions: {
     state: 1,
     description: 'Número inteiro',
     classOfToken: 'NUM',
-    canReadWhiteSpace: false,
     typeOfToken: 'INTEIRO'
   })
   updateStatesInfo({
     state: ERRORS.REAL_NUMBER.STATE_INDEX,
     description: ERRORS.REAL_NUMBER.DESCRIPTION,
     classOfToken: 'ERROR',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: 3,
     description: 'Número real',
     classOfToken: 'NUM',
-    canReadWhiteSpace: false,
     typeOfToken: 'REAL'
   })
   updateStatesInfo({
     state: ERRORS.EXPONENCIAL_NUMBER.STATE_INDEX,
     description: ERRORS.EXPONENCIAL_NUMBER.DESCRIPTION,
     classOfToken: 'ERROR',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: ERRORS.EXPONENCIAL_NUMBER_WITH_SIGN.STATE_INDEX,
     description: ERRORS.EXPONENCIAL_NUMBER_WITH_SIGN.DESCRIPTION,
     classOfToken: 'ERROR',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: 6,
     description: 'Número exponencial',
     classOfToken: 'NUM',
-    canReadWhiteSpace: false,
     typeOfToken: 'REAL'
   })
 }
@@ -339,7 +330,6 @@ const createDetectLiteralBranch = (updateFunctions: {
     state: 7,
     classOfToken: 'ERROR',
     description: 'Erro literal incompleto',
-    canReadWhiteSpace: true,
     typeOfToken: 'NULO'
   })
 
@@ -347,7 +337,6 @@ const createDetectLiteralBranch = (updateFunctions: {
     state: 8,
     classOfToken: 'LIT',
     description: 'Literal',
-    canReadWhiteSpace: false,
     typeOfToken: 'LITERAL'
   })
 }
@@ -368,7 +357,6 @@ const createDetectIdBranch = (updateFunctions: {
     state: 9,
     description: 'Identifier',
     classOfToken: 'ID',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
 }
@@ -394,14 +382,12 @@ const createDetectCommentBranch = (updateFunctions: {
     state: 10,
     classOfToken: 'ERROR',
     description: 'Erro comentário incompleto',
-    canReadWhiteSpace: true,
     typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: 11,
     description: 'Commentary',
     classOfToken: 'COMMENT',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
 }
@@ -430,35 +416,30 @@ const createDetectOPRBranch = (updateFunctions: {
     state: 13,
     classOfToken: 'OPR',
     description: '>',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: 14,
     classOfToken: 'OPR',
     description: '>=',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: 15,
     classOfToken: 'OPR',
     description: '<',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: 16,
     classOfToken: 'OPR',
     description: '<=',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
   updateStatesInfo({
     state: 18,
     classOfToken: 'OPR',
     description: '<>',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
 }
@@ -479,7 +460,6 @@ const createDetectATRBranch = (updateFunctions: {
     state: 17,
     classOfToken: 'ATR',
     description: '<-',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
 }
@@ -500,7 +480,6 @@ const createDetectOPABranch = (updateFunctions: {
     state: 19,
     classOfToken: 'OPA',
     description: 'Arithmetic Operator',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
 }
@@ -521,7 +500,6 @@ const createDetectAB_PBranch = (updateFunctions: {
     state: 20,
     classOfToken: 'AB_P',
     description: '(',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
 }
@@ -542,7 +520,6 @@ const createDetectFC_PBranch = (updateFunctions: {
     state: 21,
     classOfToken: 'FC_P',
     description: ')',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
 }
@@ -563,7 +540,6 @@ const createDetectPT_VBranch = (updateFunctions: {
     state: 22,
     classOfToken: 'PT_V',
     description: ';',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
 }
@@ -584,7 +560,6 @@ const createDetectVIRBranch = (updateFunctions: {
     state: 23,
     classOfToken: 'VIR',
     description: ',',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
 }
@@ -605,7 +580,6 @@ const createDetectEOFBranch = (updateFunctions: {
     state: 12,
     classOfToken: 'EOF',
     description: 'End of file',
-    canReadWhiteSpace: false,
     typeOfToken: 'NULO'
   })
 }
