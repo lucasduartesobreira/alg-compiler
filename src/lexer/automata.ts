@@ -19,15 +19,15 @@ const CLOSE_TOKEN_CHARS = ' \n\t;,*+-/()><-{"'
 
 const ERRORS = {
   REAL_NUMBER: {
-    STATE_INDEX: 2,
+    STATE_INDEX: 102,
     DESCRIPTION: 'Erro número real incompleto'
   },
   EXPONENCIAL_NUMBER: {
-    STATE_INDEX: 4,
+    STATE_INDEX: 103,
     DESCRIPTION: 'Erro exponencial incompleto'
   },
   EXPONENCIAL_NUMBER_WITH_SIGN: {
-    STATE_INDEX: 5,
+    STATE_INDEX: 104,
     DESCRIPTION: 'Erro exponencial incompleto'
   },
   LITERAL: {
@@ -253,20 +253,69 @@ const createDetectNumberBranch = (updateFunctions: {
     defaultTransition: ERRORS.UNEXPECTED_CHARACTER.STATE_INDEX
   }
 
+  const realNumberErrorState = ERRORS.REAL_NUMBER.STATE_INDEX
+  const exponentialNumberErrorState = ERRORS.EXPONENCIAL_NUMBER.STATE_INDEX
+  const exponentialNumberWithSignErrorState =
+    ERRORS.EXPONENCIAL_NUMBER_WITH_SIGN.STATE_INDEX
+
   updateTransitionTable(0, 1, DIGITS)
   updateTransitionTable(1, 1, DIGITS, numberBranchOptions)
   updateTransitionTable(1, -1, CLOSE_TOKEN_CHARS)
   updateTransitionTable(1, 2, '.')
-  updateTransitionTable(2, 3, DIGITS, numberBranchOptions)
+  updateTransitionTable(2, 3, DIGITS, {
+    defaultTransition: realNumberErrorState
+  })
   updateTransitionTable(3, 3, DIGITS, numberBranchOptions)
   updateTransitionTable(3, -1, CLOSE_TOKEN_CHARS)
   updateTransitionTable(1, 4, 'Ee')
   updateTransitionTable(3, 4, 'Ee')
-  updateTransitionTable(4, 5, '+-', numberBranchOptions)
+  updateTransitionTable(4, 5, '+-', {
+    defaultTransition: exponentialNumberErrorState
+  })
   updateTransitionTable(4, 6, DIGITS)
-  updateTransitionTable(5, 6, DIGITS, numberBranchOptions)
+  updateTransitionTable(5, 6, DIGITS, {
+    defaultTransition: exponentialNumberWithSignErrorState
+  })
   updateTransitionTable(6, 6, DIGITS, numberBranchOptions)
   updateTransitionTable(6, -1, CLOSE_TOKEN_CHARS)
+
+  updateTransitionTable(realNumberErrorState, realNumberErrorState, '', {
+    outOfAlphabetTransitions: realNumberErrorState,
+    defaultTransition: ERRORS.UNEXPECTED_CHARACTER.STATE_INDEX
+  })
+
+  updateTransitionTable(realNumberErrorState, -1, CLOSE_TOKEN_CHARS)
+  updateTransitionTable(realNumberErrorState, -1, 'EOF')
+
+  updateTransitionTable(
+    exponentialNumberErrorState,
+    exponentialNumberErrorState,
+    '',
+    {
+      outOfAlphabetTransitions: exponentialNumberErrorState,
+      defaultTransition: ERRORS.UNEXPECTED_CHARACTER.STATE_INDEX
+    }
+  )
+
+  updateTransitionTable(exponentialNumberErrorState, -1, CLOSE_TOKEN_CHARS)
+  updateTransitionTable(exponentialNumberErrorState, -1, 'EOF')
+
+  updateTransitionTable(
+    exponentialNumberWithSignErrorState,
+    exponentialNumberWithSignErrorState,
+    '',
+    {
+      outOfAlphabetTransitions: exponentialNumberWithSignErrorState,
+      defaultTransition: ERRORS.UNEXPECTED_CHARACTER.STATE_INDEX
+    }
+  )
+
+  updateTransitionTable(
+    exponentialNumberWithSignErrorState,
+    -1,
+    CLOSE_TOKEN_CHARS
+  )
+  updateTransitionTable(exponentialNumberWithSignErrorState, -1, 'EOF')
 
   updateAcceptableStates(1)
   updateAcceptableStates(3)
@@ -279,7 +328,7 @@ const createDetectNumberBranch = (updateFunctions: {
     typeOfToken: 'INTEIRO'
   })
   updateStatesInfo({
-    state: ERRORS.REAL_NUMBER.STATE_INDEX,
+    state: 2,
     description: ERRORS.REAL_NUMBER.DESCRIPTION,
     classOfToken: 'ERROR',
     typeOfToken: 'NULO'
@@ -291,13 +340,13 @@ const createDetectNumberBranch = (updateFunctions: {
     typeOfToken: 'REAL'
   })
   updateStatesInfo({
-    state: ERRORS.EXPONENCIAL_NUMBER.STATE_INDEX,
+    state: 4,
     description: ERRORS.EXPONENCIAL_NUMBER.DESCRIPTION,
     classOfToken: 'ERROR',
     typeOfToken: 'NULO'
   })
   updateStatesInfo({
-    state: ERRORS.EXPONENCIAL_NUMBER_WITH_SIGN.STATE_INDEX,
+    state: 5,
     description: ERRORS.EXPONENCIAL_NUMBER_WITH_SIGN.DESCRIPTION,
     classOfToken: 'ERROR',
     typeOfToken: 'NULO'
@@ -307,6 +356,27 @@ const createDetectNumberBranch = (updateFunctions: {
     description: 'Número exponencial',
     classOfToken: 'NUM',
     typeOfToken: 'REAL'
+  })
+
+  updateStatesInfo({
+    state: ERRORS.REAL_NUMBER.STATE_INDEX,
+    description: ERRORS.REAL_NUMBER.DESCRIPTION,
+    classOfToken: 'ERROR',
+    typeOfToken: 'NULO'
+  })
+
+  updateStatesInfo({
+    state: ERRORS.EXPONENCIAL_NUMBER.STATE_INDEX,
+    description: ERRORS.EXPONENCIAL_NUMBER.DESCRIPTION,
+    classOfToken: 'ERROR',
+    typeOfToken: 'NULO'
+  })
+
+  updateStatesInfo({
+    state: ERRORS.EXPONENCIAL_NUMBER_WITH_SIGN.STATE_INDEX,
+    description: ERRORS.EXPONENCIAL_NUMBER_WITH_SIGN.DESCRIPTION,
+    classOfToken: 'ERROR',
+    typeOfToken: 'NULO'
   })
 }
 

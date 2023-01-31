@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-condition */
 import { Lexema, ReservedWords, Token } from '@/lexer/lexer.types'
 import { State, StateInfo } from '@/lexer/automata.types'
 import Automata from './automata'
