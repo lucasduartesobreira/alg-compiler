@@ -6,6 +6,7 @@ type ParsingContext = {
   a: Token
   lexer: Lexer
   rulesPrinted: Array<string>
+  lastToken: Token
 }
 
 type UpdatedParsingContext = Omit<ParsingContext, 'lexer'>

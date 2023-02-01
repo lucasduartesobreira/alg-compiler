@@ -14,6 +14,8 @@ const Parser: Parser = {
     let a = lexer.scanner()
     let s = 0
     let rulesPrinted: string[] = []
+
+    let lastToken = a
     while (stack.length > 0) {
       s = stack.at(-1) as number
       const actionsForState = ACTION_TABLE.get(s)
@@ -24,6 +26,7 @@ const Parser: Parser = {
 
       if (action?.action === 'SHIFT') {
         stack.push(action.identifier)
+        lastToken = a
         a = lexer.scanner()
       } else if (action?.action === 'REDUCE') {
         const amountToPop = POP_AMOUNT_PER_RULE.get(action.identifier) as number
@@ -44,7 +47,8 @@ const Parser: Parser = {
           stack,
           a,
           lexer,
-          rulesPrinted
+          rulesPrinted,
+          lastToken
         })
         stack = updatedContext.stack
         a = updatedContext.a
