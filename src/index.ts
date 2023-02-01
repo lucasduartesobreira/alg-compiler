@@ -1,5 +1,7 @@
+/* eslint-disable no-constant-condition */
 import { Reader } from './lexer/file'
 import { Lexer } from './lexer/lexer'
+import { Parser } from './parser/parser'
 
 const args = process.argv
 
@@ -16,20 +18,9 @@ try {
     const lexer = Lexer(reader)
 
     console.log('-------------------------------------')
-    console.log(`Tokens do arquivo de endereço: ${path}`)
-    while (true) {
-      const { classe, lexema, tipo, description } = lexer.scanner()
-      if (description) {
-        console.log(
-          `Classe: '${classe}', Lexema: '${lexema}', Tipo: ${tipo}, Description: ${description}`
-        )
-      } else {
-        console.log(`Classe: '${classe}', Lexema: '${lexema}', Tipo: ${tipo}`)
-      }
+    console.log(`Reduções feitas no arquivo: ${path}`)
 
-      if (classe === 'EOF') break
-    }
-
+    Parser.parse(lexer)
     console.log('Leitura de tokens finalizada')
     console.log('-------------------------------------')
   }
