@@ -9,6 +9,7 @@ import {
 } from './errorHandler.types'
 import { NonTerminals } from './parser.types'
 import {
+  EXPECTED_TOKENS_PER_STATE,
   FOLLOW_TABLE,
   GOTO_TABLE,
   GRAMMAR_RULES,
@@ -29,7 +30,7 @@ const panicSync: Array<NonTerminals> = [
 ]
 
 const panicHandler = (context: ErrorContext) => {
-  const { stack, a, lexer, rulesPrinted } = context
+  printMessage()(context)
   const { stack, a, lexer, rulesPrinted, lastToken } = context
   let newA = a
 
@@ -130,7 +131,44 @@ const readNewToken = (context: ErrorContext) => {
   return { ...context, a: lexer.scanner() }
 }
 
+const printMessage = (useLastToken?: boolean) => (context: ErrorContext) => {
+  const { a, error, lastToken, stack } = context
+
+  const expectedTokens = EXPECTED_TOKENS_PER_STATE.get(
+    stack.at(-1) as number
+  )?.join(', ')
+  const errorData = ERROR_DATA.get(error)
+
+  if (!errorData) {
+    console.log(
+      `Erro Sintático(${error}): "${a.lexema}" inesperado, era esperado um desses: ${expectedTokens}`
+    )
+    return context
+  }
+
+  const { messageFormat } = errorData
+
+  const rule = ERROR_RULES.get(error) ?? ''
+
+  console.log(
+    `Erro sintático(${error}): `.concat(
+      messageFormat
+        .replace('%lexema%', context.a.lexema)
+        .replace('%expected_tokens%', expectedTokens ?? '')
+        .replace('%rule%', rule)
+        .concat(
+          useLastToken
+            ? `. linha: ${lastToken.start.line}, coluna: ${lastToken.start.column}`
+            : `. linha: ${a.start.line}, coluna: ${a.start.column}`
+        ) ?? ''
+    )
+  )
+
+  return context
+}
+
 const error21Reduce = (context: ErrorContext) => {
+  printMessage(true)(context)
   const { error, ...newContext } = popFromStack(1)(context)
   const reduce7 = makeAReduce(7)({ ...newContext, error: context.error })
 
@@ -145,27 +183,30 @@ const error21Reduce = (context: ErrorContext) => {
 }
 
 const ERROR_TABLE: ErrorTable = new Map([
-  [8, createPhraseHandler([addToStack(38), readNewToken])],
-  [13, createPhraseHandler([addToStack(60), readNewToken])],
-  [14, createPhraseHandler([addToStack(41), readNewToken])],
-  [15, createPhraseHandler([addToStack(42), readNewToken])],
-  [16, createPhraseHandler([addToStack(52), readNewToken])],
-  [17, createPhraseHandler([addToStack(54), readNewToken])],
+  [8, createPhraseHandler([printMessage(), addToStack(38), readNewToken])],
+  [13, createPhraseHandler([printMessage(),addToStack(60), readNewToken])],
+  [14, createPhraseHandler([printMessage(),addToStack(41), readNewToken])],
+  [15, createPhraseHandler([printMessage(), addToStack(42), readNewToken])],
+  [16, createPhraseHandler([printMessage(), addToStack(52), readNewToken])],
+  [17, createPhraseHandler([printMessage(), addToStack(54), readNewToken])],
   [
     18,
     createPhraseHandler([
+      printMessage(),
       makeAReduce(14, { tipo: 'NULO', classe: 'PT_V', lexema: ';' })
     ])
   ],
   [
     19,
     createPhraseHandler([
+      printMessage(),
       makeAReduce(15, { tipo: 'NULO', classe: 'PT_V', lexema: ';' })
     ])
   ],
   [
     20,
     createPhraseHandler([
+      printMessage(),
       makeAReduce(16, { tipo: 'NULO', classe: 'PT_V', lexema: ';' })
     ])
   ],
@@ -173,24 +214,28 @@ const ERROR_TABLE: ErrorTable = new Map([
   [
     22,
     createPhraseHandler([
+      printMessage(),
       makeAReduce(21, { tipo: 'NULO', classe: 'PT_V', lexema: ';' })
     ])
   ],
   [
     23,
     createPhraseHandler([
+      printMessage(),
       makeAReduce(22, { tipo: 'NULO', classe: 'PT_V', lexema: ';' })
     ])
   ],
   [
     24,
     createPhraseHandler([
+      printMessage(),
       makeAReduce(24, { tipo: 'NULO', classe: 'PT_V', lexema: ';' })
     ])
   ],
   [
     25,
     createPhraseHandler([
+      printMessage(),
       makeAReduce(20, { tipo: 'NULO', classe: 'PT_V', lexema: ';' })
     ])
   ]
@@ -245,17 +290,37 @@ const ERROR_DATA: ErrorData = new Map([
   [25, { messageFormat: '"," utilizado incorretamente, era esperado ";"' }]
 ])
 
+const ERROR_RULES = new Map([
+[15,  "varinicio variáveis varfim;"],
+[19,  "inteiro identificadores;"],
+[20,  "real identificadores;"],
+[21,  "literal identificadores;"],
+[27,  '"escreva "literal";'],
+[28,  "escreva 1234;"],
+[29,  "escreva A;"],
+[31,  "se (expressão) então comandos fimse"],
+[35,  "se (expressão) então comandos fimse"],
+[37,  "tipo identificador; ... varfim;"],
+[38,  "varfim; ...comandos fim"],
+[40,  "identificador,identificador...;"],
+[41,  "comando;comando;...;fim"],
+[42,  "comando;comando;...;fim"],
+[44,  "id <- id|num +|-|/|* id|num"],
+[45,  "id <- id|num +|-|/|* id|num"],
+[46,  "id <- id|num +|-|/|* id|num"],
+[47,  "comando;comando;...;fim"],
+[48,  "comando;comando;...;fim"],
+[49,  "comando;comando;...;fim"],
+[52,  "varinicio variávels varfim;"],
+[54,  "comando;comando;...;fim"],
+[58,  "varinicio variávels varfim;"],
+[59,  "comando;comando;...;fim"],
+[60,  "comando;comando;...;fim"],
+[61,  "comando;comando;...;fim"],
+])
+
 const ErrorHandler: ErrorHandler = {
   handle(error, context) {
-    console.log(
-      'Erro sintático: '.concat(
-        ERROR_DATA.get(error)
-          ?.messageFormat.replace('%lexema%', context.a.lexema)
-          .concat(
-            `. linha: ${context.a.start.line}, coluna: ${context.a.start.column}`
-          ) ?? ''
-      )
-    )
     const recoveryModeHandler = ERROR_TABLE.get(error)
 
     if (!recoveryModeHandler) return panicHandler({ ...context, error })
