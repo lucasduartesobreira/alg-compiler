@@ -119,7 +119,7 @@ const generateToken = (
     if (classOfToken === 'ID') {
       const savedIDToken = symbols.get(lexema)
       if (savedIDToken) {
-        return savedIDToken
+        return { ...savedIDToken, start, end }
       }
 
       symbols.set(lexema, newToken)
