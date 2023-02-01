@@ -54,7 +54,14 @@ const Parser: Parser = {
         a = updatedContext.a
         rulesPrinted = updatedContext.rulesPrinted
       } else {
-        throw 'Erro ação não encontrada'
+        if (a.classe === 'ERROR') {
+          console.log(
+            `Erro Léxico: ${
+              a.description ?? 'token escrito de maneira incorreta'
+            }. linha: ${a.start.line}, coluna: ${a.start.column}`
+          )
+        }
+        throw 'Erro ação não encontrada, cancelando o parsing'
       }
     }
 
