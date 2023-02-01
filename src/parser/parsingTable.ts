@@ -1,4 +1,4 @@
-import { TypeofToken } from '@/lexer/automata.types'
+import { State, TypeofToken } from '@/lexer/automata.types'
 import { ReservedWords } from '@/lexer/lexer.types'
 import {
   Action,
@@ -2019,11 +2019,77 @@ const RULE_LETTER = new Map(
   ])
 )
 
+const EXPECTED_TOKENS_PER_STATE: Map<State, Array<string>> = new Map([
+  [0, ['inicio']],
+  [1, ['EOF']],
+  [2, ['varinicio']],
+  [3, ['identificador', 'leia', 'escreva', 'se', 'fim']],
+  [4, ['varfim', 'inteiro', 'real', 'literal']],
+  [5, ['EOF']],
+  [6, ['identificador', 'leia', 'escreva', 'se', 'fim']],
+  [7, ['identificador', 'leia', 'escreva', 'se', 'fim']],
+  [8, ['identificador', 'leia', 'escreva', 'se', 'fim']],
+  [9, ['EOF']],
+  [10, ['identificador']],
+  [11, ['identificador', 'constante literal', 'constante numérica']],
+  [12, ['<-']],
+  [13, ['identificador', 'leia', 'escreva', 'se', 'fimse']],
+  [14, ['(']],
+  [15, ['identificador', 'leia', 'escreva', 'se', 'fim']],
+  [16, ['varfim', 'inteiro', 'real', 'literal']],
+  [17, [';']],
+  [18, ['identificador']],
+  [19, ['identificador']],
+  [20, ['identificador']],
+  [21, ['identificador']],
+  [22, ['EOF']],
+  [23, ['EOF']],
+  [24, ['EOF']],
+  [25, [';']],
+  [26, [';']],
+  [27, [';']],
+  [28, [';']],
+  [29, [';']],
+  [30, ['identificador', 'constante numérica']],
+  [31, ['identificador', 'leia', 'escreva', 'se', 'fimse', 'fim']],
+  [32, ['identificador', 'leia', 'escreva', 'se', 'fimse']],
+  [33, ['identificador', 'leia', 'escreva', 'se', 'fimse']],
+  [34, ['identificador', 'leia', 'escreva', 'se', 'fimse']],
+  [35, ['identificador', 'leia', 'escreva', 'se', 'fimse', 'fim']],
+  [36, ['identificador', 'constante numérica']],
+  [37, ['identificador', 'leia', 'escreva', 'se', 'fim']],
+  [38, ['identificador', 'leia', 'escreva', 'se', 'fim']],
+  [39, [';']],
+  [40, [';', ',']],
+  [41, ['identificador', 'leia', 'escreva', 'se', 'fimse', 'fim']],
+  [42, ['identificador', 'leia', 'escreva', 'se', 'fimse', 'fim']],
+  [43, [';']],
+  [44, [';', '+', '-', '*', '/']],
+  [45, [';', '+', '-', '*', '/', ')', '<', '>', '<=', '>=', '=', '<>']],
+  [46, [';', '+', '-', '*', '/', ')', '<', '>', '<=', '>=', '=', '<>']],
+  [47, ['identificador', 'leia', 'escreva', 'se', 'fimse', 'fim']],
+  [48, ['identificador', 'leia', 'escreva', 'se', 'fimse', 'fim']],
+  [49, ['identificador', 'leia', 'escreva', 'se', 'fimse', 'fim']],
+  [50, [')']],
+  [51, ['<', '>', '<=', '>=', '=', '<>']],
+  [52, ['varfim', 'inteiro', 'real', 'literal']],
+  [53, ['identificador']],
+  [54, ['identificador', 'leia', 'escreva', 'se', 'fimse', 'fim']],
+  [55, ['identificador', 'constante numérica']],
+  [56, ['entao']],
+  [57, ['identificador', 'constante numérica']],
+  [58, [';']],
+  [59, [';']],
+  [60, ['identificador', 'leia', 'escreva', 'se', 'fimse']],
+  [61, [')']]
+])
+
 export {
   ACTION_TABLE,
   GOTO_TABLE,
   FOLLOW_TABLE,
   GRAMMAR_RULES,
   POP_AMOUNT_PER_RULE,
-  RULE_LETTER
+  RULE_LETTER,
+  EXPECTED_TOKENS_PER_STATE
 }
