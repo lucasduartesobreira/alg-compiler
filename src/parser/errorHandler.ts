@@ -26,42 +26,46 @@ const panicSync: Array<NonTerminals> = [
   'A',
   'ES',
   'CMD',
-  'COND'
+  'COND',
+  'ARG'
 ]
 
-const panicHandler = (context: ErrorContext) => {
-  printMessage()(context)
-  const { stack, a, lexer, rulesPrinted, lastToken } = context
-  let newA = a
+const createPanicHandler =
+  (useLastToken?: boolean) => (context: ErrorContext) => {
+    printMessage(useLastToken)(context)
+    const { stack, a, lexer, rulesPrinted, lastToken } = context
+    let newA = a
 
-  while (stack.length > 0) {
-    const poppedStack = stack.pop()
+    while (stack.length > 0) {
+      const poppedStack = stack.pop()
 
-    if (!poppedStack) throw 'Erro pilha vazia no panic handler'
+      if (!poppedStack) throw 'Erro pilha vazia no panic handler'
 
-    const stateGotoTable = GOTO_TABLE.get(poppedStack)
+      const stateGotoTable = GOTO_TABLE.get(poppedStack)
 
-    if (!stateGotoTable) {
-      continue
+      if (!stateGotoTable) {
+        continue
+      }
+
+      const gotoSyncRule = panicSync.find((value) => stateGotoTable.has(value))
+
+      if (gotoSyncRule) {
+        stack.push(poppedStack)
+        let EOFCount = 0
+        do {
+          if (FOLLOW_TABLE.get(gotoSyncRule)?.has(newA.classe)) {
+            stack.push(stateGotoTable.get(gotoSyncRule) as number)
+            return { stack, a: newA, rulesPrinted, lastToken }
+          }
+          newA = lexer.scanner()
+          EOFCount += newA.classe === 'EOF' ? 1 : 0
+        } while (EOFCount !== 2)
+
+        throw `Erro: chegou ao final do arquivo e não foi possível terminar a recuperação do erro ${context.error}`
+      }
     }
-
-    const gotoSyncRule = panicSync.find((value) => stateGotoTable.has(value))
-
-    if (gotoSyncRule) {
-      stack.push(poppedStack)
-      do {
-        if (FOLLOW_TABLE.get(gotoSyncRule)?.has(newA.classe)) {
-          stack.push(stateGotoTable.get(gotoSyncRule) as number)
-          return { stack, a: newA, rulesPrinted, lastToken }
-        }
-        newA = lexer.scanner()
-      } while (newA.classe !== 'EOF')
-
-      throw `Erro: chegou ao final do arquivo e não foi possível terminar a recuperação do erro ${context.error}`
-    }
+    throw 'Erro pilha vazia no panic handler'
   }
-  throw 'Erro pilha vazia no panic handler'
-}
 
 const createPhraseHandler =
   (listOfActions: Array<(context: ErrorContext) => ParsingContext>) =>
@@ -148,7 +152,7 @@ const printMessage = (useLastToken?: boolean) => (context: ErrorContext) => {
 
   const { messageFormat } = errorData
 
-  const rule = ERROR_RULES.get(error) ?? ''
+  const rule = ERROR_RULES.get(stack.at(-1) as number) ?? ''
 
   console.log(
     `Erro sintático(${error}): `.concat(
@@ -158,8 +162,10 @@ const printMessage = (useLastToken?: boolean) => (context: ErrorContext) => {
         .replace('%rule%', rule)
         .concat(
           useLastToken
-            ? `. linha: ${lastToken.start.line}, coluna: ${lastToken.start.column}`
-            : `. linha: ${a.start.line}, coluna: ${a.start.column}`
+            ? `. linha: ${lastToken.start.line}, coluna: ${
+                lastToken.start.column + 1
+              }`
+            : `. linha: ${a.start.line}, coluna: ${a.start.column + 1}`
         ) ?? ''
     )
   )
@@ -184,8 +190,9 @@ const error21Reduce = (context: ErrorContext) => {
 
 const ERROR_TABLE: ErrorTable = new Map([
   [8, createPhraseHandler([printMessage(), addToStack(38), readNewToken])],
-  [13, createPhraseHandler([printMessage(),addToStack(60), readNewToken])],
-  [14, createPhraseHandler([printMessage(),addToStack(41), readNewToken])],
+  [9, createPanicHandler(true)],
+  [13, createPhraseHandler([printMessage(), addToStack(60), readNewToken])],
+  [14, createPhraseHandler([printMessage(), addToStack(41), readNewToken])],
   [15, createPhraseHandler([printMessage(), addToStack(42), readNewToken])],
   [16, createPhraseHandler([printMessage(), addToStack(52), readNewToken])],
   [17, createPhraseHandler([printMessage(), addToStack(54), readNewToken])],
@@ -253,7 +260,7 @@ const ERROR_DATA: ErrorData = new Map([
     8,
     { messageFormat: '"%lexema%" utilizado incorretamente, era esperado ";"' }
   ],
-  [9, { messageFormat: 'Estrutura sintática incorreta' }],
+  [9, { messageFormat: 'Estrutura sintática incorreta, esperado: "%rule%"' }],
   [10, { messageFormat: '")" era esperado, foi encontrado: "%lexema%"' }],
   [
     11,
@@ -291,39 +298,39 @@ const ERROR_DATA: ErrorData = new Map([
 ])
 
 const ERROR_RULES = new Map([
-[15,  "varinicio variáveis varfim;"],
-[19,  "inteiro identificadores;"],
-[20,  "real identificadores;"],
-[21,  "literal identificadores;"],
-[27,  '"escreva "literal";'],
-[28,  "escreva 1234;"],
-[29,  "escreva A;"],
-[31,  "se (expressão) então comandos fimse"],
-[35,  "se (expressão) então comandos fimse"],
-[37,  "tipo identificador; ... varfim;"],
-[38,  "varfim; ...comandos fim"],
-[40,  "identificador,identificador...;"],
-[41,  "comando;comando;...;fim"],
-[42,  "comando;comando;...;fim"],
-[44,  "id <- id|num +|-|/|* id|num"],
-[45,  "id <- id|num +|-|/|* id|num"],
-[46,  "id <- id|num +|-|/|* id|num"],
-[47,  "comando;comando;...;fim"],
-[48,  "comando;comando;...;fim"],
-[49,  "comando;comando;...;fim"],
-[52,  "varinicio variávels varfim;"],
-[54,  "comando;comando;...;fim"],
-[58,  "varinicio variávels varfim;"],
-[59,  "comando;comando;...;fim"],
-[60,  "comando;comando;...;fim"],
-[61,  "comando;comando;...;fim"],
+  [15, 'varinicio variáveis varfim;'],
+  [19, 'inteiro identificadores;'],
+  [20, 'real identificadores;'],
+  [21, 'literal identificadores;'],
+  [27, 'escreva "literal";'],
+  [28, 'escreva 1234;'],
+  [29, 'escreva A;'],
+  [31, 'se (expressão) então comandos fimse'],
+  [35, 'se (expressão) então comandos fimse'],
+  [37, 'tipo identificador; ... varfim;'],
+  [38, 'varfim; ...comandos fim'],
+  [40, 'identificador,identificador...;'],
+  [41, 'comando;comando;...;fim'],
+  [42, 'comando;comando;...;fim'],
+  [44, 'id <- id|num +|-|/|* id|num'],
+  [45, 'id <- id|num +|-|/|* id|num'],
+  [46, 'id <- id|num +|-|/|* id|num'],
+  [47, 'comando;comando;...;fim'],
+  [48, 'comando;comando;...;fim'],
+  [49, 'comando;comando;...;fim'],
+  [52, 'varinicio variávels varfim;'],
+  [54, 'comando;comando;...;fim'],
+  [58, 'varinicio variávels varfim;'],
+  [59, 'comando;comando;...;fim'],
+  [60, 'comando;comando;...;fim'],
+  [61, 'comando;comando;...;fim']
 ])
 
 const ErrorHandler: ErrorHandler = {
   handle(error, context) {
     const recoveryModeHandler = ERROR_TABLE.get(error)
 
-    if (!recoveryModeHandler) return panicHandler({ ...context, error })
+    if (!recoveryModeHandler) return createPanicHandler()({ ...context, error })
 
     return recoveryModeHandler({ ...context, error })
   }
