@@ -58,8 +58,12 @@ const Parser: Parser = {
           console.log(
             `Erro Léxico: ${
               a.description ?? 'token escrito de maneira incorreta'
-            }. linha: ${a.start.line}, coluna: ${a.start.column}`
+            }`
           )
+
+          a = lexer.scanner()
+
+          continue
         }
         throw 'Erro ação não encontrada, cancelando o parsing'
       }
