@@ -5,6 +5,7 @@ type ParsingContext = {
   stack: Array<State>
   a: Token
   lexer: Lexer
+  rulesPrinted: Array<string>
 }
 
 type UpdatedParsingContext = Omit<ParsingContext, 'lexer'>
@@ -28,5 +29,6 @@ export {
   ErrorTable,
   ErrorContext,
   RecoveryModeHandler,
-  ErrorData
+  ErrorData,
+  UpdatedParsingContext
 }

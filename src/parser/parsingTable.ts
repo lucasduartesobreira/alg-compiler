@@ -717,7 +717,7 @@ const ACTION_TABLE: ActionTable = new Map([
       ['varfim', { action: 'ERROR', identifier: 4 }],
       ['PT_V', { action: 'SHIFT', identifier: 41 }],
       ['ID', { action: 'ERROR', identifier: 4 }],
-      ['VIR', { action: 'ERROR', identifier: 8 }],
+      ['VIR', { action: 'ERROR', identifier: 14 }],
       ['inteiro', { action: 'ERROR', identifier: 4 }],
       ['real', { action: 'ERROR', identifier: 4 }],
       ['literal', { action: 'ERROR', identifier: 4 }],
@@ -745,7 +745,7 @@ const ACTION_TABLE: ActionTable = new Map([
       ['varfim', { action: 'ERROR', identifier: 4 }],
       ['PT_V', { action: 'SHIFT', identifier: 42 }],
       ['ID', { action: 'ERROR', identifier: 4 }],
-      ['VIR', { action: 'ERROR', identifier: 8 }],
+      ['VIR', { action: 'ERROR', identifier: 15 }],
       ['inteiro', { action: 'ERROR', identifier: 4 }],
       ['real', { action: 'ERROR', identifier: 4 }],
       ['literal', { action: 'ERROR', identifier: 4 }],
@@ -773,7 +773,7 @@ const ACTION_TABLE: ActionTable = new Map([
       ['varfim', { action: 'ERROR', identifier: 9 }],
       ['PT_V', { action: 'REDUCE', identifier: 14 }],
       ['ID', { action: 'ERROR', identifier: 9 }],
-      ['VIR', { action: 'ERROR', identifier: 9 }],
+      ['VIR', { action: 'ERROR', identifier: 18 }],
       ['inteiro', { action: 'ERROR', identifier: 9 }],
       ['real', { action: 'ERROR', identifier: 9 }],
       ['literal', { action: 'ERROR', identifier: 9 }],
@@ -801,7 +801,7 @@ const ACTION_TABLE: ActionTable = new Map([
       ['varfim', { action: 'ERROR', identifier: 9 }],
       ['PT_V', { action: 'REDUCE', identifier: 15 }],
       ['ID', { action: 'ERROR', identifier: 9 }],
-      ['VIR', { action: 'ERROR', identifier: 9 }],
+      ['VIR', { action: 'ERROR', identifier: 19 }],
       ['inteiro', { action: 'ERROR', identifier: 9 }],
       ['real', { action: 'ERROR', identifier: 9 }],
       ['literal', { action: 'ERROR', identifier: 9 }],
@@ -829,7 +829,7 @@ const ACTION_TABLE: ActionTable = new Map([
       ['varfim', { action: 'ERROR', identifier: 9 }],
       ['PT_V', { action: 'REDUCE', identifier: 16 }],
       ['ID', { action: 'ERROR', identifier: 9 }],
-      ['VIR', { action: 'ERROR', identifier: 9 }],
+      ['VIR', { action: 'ERROR', identifier: 20 }],
       ['inteiro', { action: 'ERROR', identifier: 9 }],
       ['real', { action: 'ERROR', identifier: 9 }],
       ['literal', { action: 'ERROR', identifier: 9 }],
@@ -1109,7 +1109,7 @@ const ACTION_TABLE: ActionTable = new Map([
       ['varfim', { action: 'ERROR', identifier: 4 }],
       ['PT_V', { action: 'SHIFT', identifier: 52 }],
       ['ID', { action: 'ERROR', identifier: 4 }],
-      ['VIR', { action: 'ERROR', identifier: 8 }],
+      ['VIR', { action: 'ERROR', identifier: 16 }],
       ['inteiro', { action: 'ERROR', identifier: 4 }],
       ['real', { action: 'ERROR', identifier: 4 }],
       ['literal', { action: 'ERROR', identifier: 4 }],
@@ -1221,7 +1221,7 @@ const ACTION_TABLE: ActionTable = new Map([
       ['varfim', { action: 'ERROR', identifier: 4 }],
       ['PT_V', { action: 'SHIFT', identifier: 54 }],
       ['ID', { action: 'ERROR', identifier: 4 }],
-      ['VIR', { action: 'ERROR', identifier: 8 }],
+      ['VIR', { action: 'ERROR', identifier: 17 }],
       ['inteiro', { action: 'ERROR', identifier: 4 }],
       ['real', { action: 'ERROR', identifier: 4 }],
       ['literal', { action: 'ERROR', identifier: 4 }],
@@ -1249,7 +1249,7 @@ const ACTION_TABLE: ActionTable = new Map([
       ['varfim', { action: 'ERROR', identifier: 9 }],
       ['PT_V', { action: 'REDUCE', identifier: 20 }],
       ['ID', { action: 'ERROR', identifier: 9 }],
-      ['VIR', { action: 'ERROR', identifier: 9 }],
+      ['VIR', { action: 'ERROR', identifier: 25 }],
       ['inteiro', { action: 'ERROR', identifier: 9 }],
       ['real', { action: 'ERROR', identifier: 9 }],
       ['literal', { action: 'ERROR', identifier: 9 }],
@@ -1277,7 +1277,7 @@ const ACTION_TABLE: ActionTable = new Map([
       ['varfim', { action: 'ERROR', identifier: 9 }],
       ['PT_V', { action: 'REDUCE', identifier: 21 }],
       ['ID', { action: 'ERROR', identifier: 9 }],
-      ['VIR', { action: 'ERROR', identifier: 9 }],
+      ['VIR', { action: 'ERROR', identifier: 22 }],
       ['inteiro', { action: 'ERROR', identifier: 9 }],
       ['real', { action: 'ERROR', identifier: 9 }],
       ['literal', { action: 'ERROR', identifier: 9 }],
@@ -1305,7 +1305,7 @@ const ACTION_TABLE: ActionTable = new Map([
       ['varfim', { action: 'ERROR', identifier: 9 }],
       ['PT_V', { action: 'REDUCE', identifier: 22 }],
       ['ID', { action: 'ERROR', identifier: 9 }],
-      ['VIR', { action: 'ERROR', identifier: 9 }],
+      ['VIR', { action: 'ERROR', identifier: 23 }],
       ['inteiro', { action: 'ERROR', identifier: 9 }],
       ['real', { action: 'ERROR', identifier: 9 }],
       ['literal', { action: 'ERROR', identifier: 9 }],
@@ -1498,13 +1498,13 @@ const ACTION_TABLE: ActionTable = new Map([
     new Map<TypeofToken | ReservedWords, Action>([
       ['inicio', { action: 'ERROR', identifier: 4 }],
       ['varinicio', { action: 'ERROR', identifier: 4 }],
-      ['varfim', { action: 'ERROR', identifier: 4 }],
+      ['varfim', { action: 'ERROR', identifier: 21 }],
       ['PT_V', { action: 'ERROR', identifier: 4 }],
       ['ID', { action: 'SHIFT', identifier: 40 }],
       ['VIR', { action: 'ERROR', identifier: 4 }],
-      ['inteiro', { action: 'ERROR', identifier: 4 }],
-      ['real', { action: 'ERROR', identifier: 4 }],
-      ['literal', { action: 'ERROR', identifier: 4 }],
+      ['inteiro', { action: 'ERROR', identifier: 21 }],
+      ['real', { action: 'ERROR', identifier: 21 }],
+      ['literal', { action: 'ERROR', identifier: 21 }],
       ['leia', { action: 'ERROR', identifier: 4 }],
       ['escreva', { action: 'ERROR', identifier: 4 }],
       ['LIT', { action: 'ERROR', identifier: 4 }],
@@ -1669,7 +1669,7 @@ const ACTION_TABLE: ActionTable = new Map([
       ['varfim', { action: 'ERROR', identifier: 9 }],
       ['PT_V', { action: 'REDUCE', identifier: 19 }],
       ['ID', { action: 'ERROR', identifier: 9 }],
-      ['VIR', { action: 'ERROR', identifier: 9 }],
+      ['VIR', { action: 'ERROR', identifier: 24 }],
       ['inteiro', { action: 'ERROR', identifier: 9 }],
       ['real', { action: 'ERROR', identifier: 9 }],
       ['literal', { action: 'ERROR', identifier: 9 }],
@@ -1746,6 +1746,7 @@ const ACTION_TABLE: ActionTable = new Map([
     ])
   ]
 ])
+
 const GOTO_TABLE: GotoTable = new Map([
   [0, new Map<NonTerminals, number>([['P', 1]])],
   [2, new Map<NonTerminals, number>([['V', 3]])],
@@ -2004,4 +2005,25 @@ const GRAMMAR_RULES = new Map([
   [31, 'A->fim']
 ])
 
-export { ACTION_TABLE, GOTO_TABLE, FOLLOW_TABLE, GRAMMAR_RULES }
+const POP_AMOUNT_PER_RULE = new Map(
+  Array.from(GRAMMAR_RULES.entries()).map((value) => [
+    value[0],
+    value[1].replace(/[A-Z']+->/, '').split(' ').length
+  ])
+)
+
+const RULE_LETTER = new Map(
+  Array.from(GRAMMAR_RULES.entries()).map((value) => [
+    value[0],
+    value[1].replace(/->.*/, '')
+  ])
+)
+
+export {
+  ACTION_TABLE,
+  GOTO_TABLE,
+  FOLLOW_TABLE,
+  GRAMMAR_RULES,
+  POP_AMOUNT_PER_RULE,
+  RULE_LETTER
+}
