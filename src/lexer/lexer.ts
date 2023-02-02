@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-condition */
 import { Lexema, ReservedWords, Token } from '@/lexer/lexer.types'
 import { State, StateInfo } from '@/lexer/automata.types'
 import Automata from './automata'
@@ -118,7 +119,7 @@ const generateToken = (
     if (classOfToken === 'ID') {
       const savedIDToken = symbols.get(lexema)
       if (savedIDToken) {
-        return savedIDToken
+        return { ...savedIDToken, start, end }
       }
 
       symbols.set(lexema, newToken)

@@ -51,8 +51,8 @@ describe('Testing lexer', () => {
             classe: 'se',
             lexema: 'se',
             tipo: 'se',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 1, column: 5 },
+            end: { line: 1, column: 6 }
           },
           {
             classe: 'ID',
@@ -87,8 +87,8 @@ describe('Testing lexer', () => {
             classe: 'fimse',
             lexema: 'fimse',
             tipo: 'fimse',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 2, column: 1 },
+            end: { line: 2, column: 5 }
           }
         ]
       }
@@ -137,23 +137,26 @@ describe('Testing lexer', () => {
             classe: 'inicio',
             tipo: 'inicio',
             lexema: 'inicio',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 1, column: 1 },
+            end: { line: 1, column: 6 }
           },
+
           {
             classe: 'varinicio',
             tipo: 'varinicio',
             lexema: 'varinicio',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 2, column: 2 },
+            end: { line: 2, column: 10 }
           },
+
           {
             classe: 'literal',
             tipo: 'literal',
             lexema: 'literal',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 3, column: 4 },
+            end: { line: 3, column: 10 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
@@ -161,6 +164,7 @@ describe('Testing lexer', () => {
             start: { line: 3, column: 12 },
             end: { line: 3, column: 12 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -168,13 +172,15 @@ describe('Testing lexer', () => {
             start: { line: 3, column: 13 },
             end: { line: 3, column: 13 }
           },
+
           {
             classe: 'inteiro',
             tipo: 'inteiro',
             lexema: 'inteiro',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 4, column: 4 },
+            end: { line: 4, column: 10 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
@@ -182,6 +188,7 @@ describe('Testing lexer', () => {
             start: { line: 4, column: 12 },
             end: { line: 4, column: 12 }
           },
+
           {
             classe: 'VIR',
             tipo: 'NULO',
@@ -189,6 +196,7 @@ describe('Testing lexer', () => {
             start: { line: 4, column: 13 },
             end: { line: 4, column: 13 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
@@ -196,6 +204,7 @@ describe('Testing lexer', () => {
             start: { line: 4, column: 15 },
             end: { line: 4, column: 15 }
           },
+
           {
             classe: 'VIR',
             tipo: 'NULO',
@@ -203,6 +212,7 @@ describe('Testing lexer', () => {
             start: { line: 4, column: 16 },
             end: { line: 4, column: 16 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
@@ -210,6 +220,7 @@ describe('Testing lexer', () => {
             start: { line: 4, column: 18 },
             end: { line: 4, column: 18 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -217,13 +228,15 @@ describe('Testing lexer', () => {
             start: { line: 4, column: 19 },
             end: { line: 4, column: 19 }
           },
+
           {
             classe: 'real',
             tipo: 'real',
             lexema: 'real',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 5, column: 4 },
+            end: { line: 5, column: 7 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
@@ -231,6 +244,7 @@ describe('Testing lexer', () => {
             start: { line: 5, column: 9 },
             end: { line: 5, column: 9 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -238,13 +252,15 @@ describe('Testing lexer', () => {
             start: { line: 5, column: 11 },
             end: { line: 5, column: 11 }
           },
+
           {
             classe: 'varfim',
             tipo: 'varfim',
             lexema: 'varfim',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 6, column: 2 },
+            end: { line: 6, column: 7 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -252,13 +268,15 @@ describe('Testing lexer', () => {
             start: { line: 6, column: 8 },
             end: { line: 6, column: 8 }
           },
+
           {
             classe: 'escreva',
             tipo: 'escreva',
             lexema: 'escreva',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 7, column: 2 },
+            end: { line: 7, column: 8 }
           },
+
           {
             classe: 'LIT',
             tipo: 'LITERAL',
@@ -266,6 +284,7 @@ describe('Testing lexer', () => {
             start: { line: 7, column: 10 },
             end: { line: 7, column: 20 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -273,20 +292,23 @@ describe('Testing lexer', () => {
             start: { line: 7, column: 21 },
             end: { line: 7, column: 21 }
           },
+
           {
             classe: 'leia',
             tipo: 'leia',
             lexema: 'leia',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 8, column: 2 },
+            end: { line: 8, column: 5 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'B',
-            start: { line: 4, column: 12 },
-            end: { line: 4, column: 12 }
+            start: { line: 8, column: 7 },
+            end: { line: 8, column: 7 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -294,13 +316,15 @@ describe('Testing lexer', () => {
             start: { line: 8, column: 8 },
             end: { line: 8, column: 8 }
           },
+
           {
             classe: 'escreva',
             tipo: 'escreva',
             lexema: 'escreva',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 9, column: 2 },
+            end: { line: 9, column: 8 }
           },
+
           {
             classe: 'LIT',
             tipo: 'LITERAL',
@@ -308,6 +332,7 @@ describe('Testing lexer', () => {
             start: { line: 9, column: 10 },
             end: { line: 9, column: 20 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -315,20 +340,23 @@ describe('Testing lexer', () => {
             start: { line: 9, column: 21 },
             end: { line: 9, column: 21 }
           },
+
           {
             classe: 'leia',
             tipo: 'leia',
             lexema: 'leia',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 10, column: 2 },
+            end: { line: 10, column: 5 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'A',
-            start: { line: 3, column: 12 },
-            end: { line: 3, column: 12 }
+            start: { line: 10, column: 7 },
+            end: { line: 10, column: 7 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -336,13 +364,15 @@ describe('Testing lexer', () => {
             start: { line: 10, column: 8 },
             end: { line: 10, column: 8 }
           },
+
           {
             classe: 'se',
             tipo: 'se',
             lexema: 'se',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 11, column: 2 },
+            end: { line: 11, column: 3 }
           },
+
           {
             classe: 'AB_P',
             tipo: 'NULO',
@@ -350,13 +380,15 @@ describe('Testing lexer', () => {
             start: { line: 11, column: 4 },
             end: { line: 11, column: 4 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'B',
-            start: { line: 4, column: 12 },
-            end: { line: 4, column: 12 }
+            start: { line: 11, column: 5 },
+            end: { line: 11, column: 5 }
           },
+
           {
             classe: 'OPR',
             tipo: 'NULO',
@@ -364,6 +396,7 @@ describe('Testing lexer', () => {
             start: { line: 11, column: 6 },
             end: { line: 11, column: 6 }
           },
+
           {
             classe: 'NUM',
             tipo: 'INTEIRO',
@@ -371,6 +404,7 @@ describe('Testing lexer', () => {
             start: { line: 11, column: 7 },
             end: { line: 11, column: 7 }
           },
+
           {
             classe: 'FC_P',
             tipo: 'NULO',
@@ -378,20 +412,23 @@ describe('Testing lexer', () => {
             start: { line: 11, column: 8 },
             end: { line: 11, column: 8 }
           },
+
           {
             classe: 'entao',
             tipo: 'entao',
             lexema: 'entao',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 12, column: 2 },
+            end: { line: 12, column: 6 }
           },
+
           {
             classe: 'se',
             tipo: 'se',
             lexema: 'se',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 13, column: 4 },
+            end: { line: 13, column: 5 }
           },
+
           {
             classe: 'AB_P',
             tipo: 'NULO',
@@ -399,13 +436,15 @@ describe('Testing lexer', () => {
             start: { line: 13, column: 6 },
             end: { line: 13, column: 6 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'B',
-            start: { line: 4, column: 12 },
-            end: { line: 4, column: 12 }
+            start: { line: 13, column: 7 },
+            end: { line: 13, column: 7 }
           },
+
           {
             classe: 'OPR',
             tipo: 'NULO',
@@ -413,6 +452,7 @@ describe('Testing lexer', () => {
             start: { line: 13, column: 8 },
             end: { line: 13, column: 9 }
           },
+
           {
             classe: 'NUM',
             tipo: 'INTEIRO',
@@ -420,6 +460,7 @@ describe('Testing lexer', () => {
             start: { line: 13, column: 10 },
             end: { line: 13, column: 10 }
           },
+
           {
             classe: 'FC_P',
             tipo: 'NULO',
@@ -427,20 +468,23 @@ describe('Testing lexer', () => {
             start: { line: 13, column: 11 },
             end: { line: 13, column: 11 }
           },
+
           {
             classe: 'entao',
             tipo: 'entao',
             lexema: 'entao',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 14, column: 4 },
+            end: { line: 14, column: 8 }
           },
+
           {
             classe: 'escreva',
             tipo: 'escreva',
             lexema: 'escreva',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 15, column: 6 },
+            end: { line: 15, column: 12 }
           },
+
           {
             classe: 'LIT',
             tipo: 'LITERAL',
@@ -448,6 +492,7 @@ describe('Testing lexer', () => {
             start: { line: 15, column: 14 },
             end: { line: 15, column: 33 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -455,27 +500,31 @@ describe('Testing lexer', () => {
             start: { line: 15, column: 34 },
             end: { line: 15, column: 34 }
           },
+
           {
             classe: 'fimse',
             tipo: 'fimse',
             lexema: 'fimse',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 16, column: 4 },
+            end: { line: 16, column: 8 }
           },
+
           {
             classe: 'fimse',
             tipo: 'fimse',
             lexema: 'fimse',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 17, column: 2 },
+            end: { line: 17, column: 6 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'B',
-            start: { line: 4, column: 12 },
-            end: { line: 4, column: 12 }
+            start: { line: 18, column: 2 },
+            end: { line: 18, column: 2 }
           },
+
           {
             classe: 'ATR',
             tipo: 'NULO',
@@ -483,13 +532,15 @@ describe('Testing lexer', () => {
             start: { line: 18, column: 3 },
             end: { line: 18, column: 4 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'B',
-            start: { line: 4, column: 12 },
-            end: { line: 4, column: 12 }
+            start: { line: 18, column: 5 },
+            end: { line: 18, column: 5 }
           },
+
           {
             classe: 'OPA',
             tipo: 'NULO',
@@ -497,6 +548,7 @@ describe('Testing lexer', () => {
             start: { line: 18, column: 6 },
             end: { line: 18, column: 6 }
           },
+
           {
             classe: 'NUM',
             tipo: 'INTEIRO',
@@ -504,6 +556,7 @@ describe('Testing lexer', () => {
             start: { line: 18, column: 7 },
             end: { line: 18, column: 7 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -511,13 +564,15 @@ describe('Testing lexer', () => {
             start: { line: 18, column: 8 },
             end: { line: 18, column: 8 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'B',
-            start: { line: 4, column: 12 },
-            end: { line: 4, column: 12 }
+            start: { line: 19, column: 2 },
+            end: { line: 19, column: 2 }
           },
+
           {
             classe: 'ATR',
             tipo: 'NULO',
@@ -525,13 +580,15 @@ describe('Testing lexer', () => {
             start: { line: 19, column: 3 },
             end: { line: 19, column: 4 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'B',
-            start: { line: 4, column: 12 },
-            end: { line: 4, column: 12 }
+            start: { line: 19, column: 5 },
+            end: { line: 19, column: 5 }
           },
+
           {
             classe: 'OPA',
             tipo: 'NULO',
@@ -539,6 +596,7 @@ describe('Testing lexer', () => {
             start: { line: 19, column: 6 },
             end: { line: 19, column: 6 }
           },
+
           {
             classe: 'NUM',
             tipo: 'INTEIRO',
@@ -546,6 +604,7 @@ describe('Testing lexer', () => {
             start: { line: 19, column: 7 },
             end: { line: 19, column: 7 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -553,13 +612,15 @@ describe('Testing lexer', () => {
             start: { line: 19, column: 8 },
             end: { line: 19, column: 8 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'B',
-            start: { line: 4, column: 12 },
-            end: { line: 4, column: 12 }
+            start: { line: 20, column: 2 },
+            end: { line: 20, column: 2 }
           },
+
           {
             classe: 'ATR',
             tipo: 'NULO',
@@ -567,13 +628,15 @@ describe('Testing lexer', () => {
             start: { line: 20, column: 3 },
             end: { line: 20, column: 4 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'B',
-            start: { line: 4, column: 12 },
-            end: { line: 4, column: 12 }
+            start: { line: 20, column: 5 },
+            end: { line: 20, column: 5 }
           },
+
           {
             classe: 'OPA',
             tipo: 'NULO',
@@ -581,6 +644,7 @@ describe('Testing lexer', () => {
             start: { line: 20, column: 6 },
             end: { line: 20, column: 6 }
           },
+
           {
             classe: 'NUM',
             tipo: 'INTEIRO',
@@ -588,6 +652,7 @@ describe('Testing lexer', () => {
             start: { line: 20, column: 7 },
             end: { line: 20, column: 7 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -595,13 +660,15 @@ describe('Testing lexer', () => {
             start: { line: 20, column: 8 },
             end: { line: 20, column: 8 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'D',
-            start: { line: 4, column: 15 },
-            end: { line: 4, column: 15 }
+            start: { line: 21, column: 2 },
+            end: { line: 21, column: 2 }
           },
+
           {
             classe: 'ATR',
             tipo: 'NULO',
@@ -609,13 +676,15 @@ describe('Testing lexer', () => {
             start: { line: 21, column: 3 },
             end: { line: 21, column: 4 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'B',
-            start: { line: 4, column: 12 },
-            end: { line: 4, column: 12 }
+            start: { line: 21, column: 5 },
+            end: { line: 21, column: 5 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -623,13 +692,15 @@ describe('Testing lexer', () => {
             start: { line: 21, column: 6 },
             end: { line: 21, column: 6 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'C',
-            start: { line: 5, column: 9 },
-            end: { line: 5, column: 9 }
+            start: { line: 22, column: 2 },
+            end: { line: 22, column: 2 }
           },
+
           {
             classe: 'ATR',
             tipo: 'NULO',
@@ -637,6 +708,7 @@ describe('Testing lexer', () => {
             start: { line: 22, column: 3 },
             end: { line: 22, column: 4 }
           },
+
           {
             classe: 'NUM',
             tipo: 'REAL',
@@ -644,6 +716,7 @@ describe('Testing lexer', () => {
             start: { line: 22, column: 5 },
             end: { line: 22, column: 7 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -651,13 +724,15 @@ describe('Testing lexer', () => {
             start: { line: 22, column: 8 },
             end: { line: 22, column: 8 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'E',
-            start: { line: 4, column: 18 },
-            end: { line: 4, column: 18 }
+            start: { line: 23, column: 2 },
+            end: { line: 23, column: 2 }
           },
+
           {
             classe: 'ATR',
             tipo: 'NULO',
@@ -665,13 +740,15 @@ describe('Testing lexer', () => {
             start: { line: 23, column: 3 },
             end: { line: 23, column: 4 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'B',
-            start: { line: 4, column: 12 },
-            end: { line: 4, column: 12 }
+            start: { line: 23, column: 5 },
+            end: { line: 23, column: 5 }
           },
+
           {
             classe: 'OPA',
             tipo: 'NULO',
@@ -679,6 +756,7 @@ describe('Testing lexer', () => {
             start: { line: 23, column: 6 },
             end: { line: 23, column: 6 }
           },
+
           {
             classe: 'NUM',
             tipo: 'INTEIRO',
@@ -686,6 +764,7 @@ describe('Testing lexer', () => {
             start: { line: 23, column: 7 },
             end: { line: 23, column: 7 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -693,20 +772,23 @@ describe('Testing lexer', () => {
             start: { line: 23, column: 8 },
             end: { line: 23, column: 8 }
           },
+
           {
             classe: 'escreva',
             tipo: 'escreva',
             lexema: 'escreva',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 24, column: 2 },
+            end: { line: 24, column: 8 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'C',
-            start: { line: 5, column: 9 },
-            end: { line: 5, column: 9 }
+            start: { line: 24, column: 10 },
+            end: { line: 24, column: 10 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -714,13 +796,15 @@ describe('Testing lexer', () => {
             start: { line: 24, column: 11 },
             end: { line: 24, column: 11 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'B',
-            start: { line: 4, column: 12 },
-            end: { line: 4, column: 12 }
+            start: { line: 25, column: 2 },
+            end: { line: 25, column: 2 }
           },
+
           {
             classe: 'ATR',
             tipo: 'NULO',
@@ -728,13 +812,15 @@ describe('Testing lexer', () => {
             start: { line: 25, column: 3 },
             end: { line: 25, column: 4 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'B',
-            start: { line: 4, column: 12 },
-            end: { line: 4, column: 12 }
+            start: { line: 25, column: 5 },
+            end: { line: 25, column: 5 }
           },
+
           {
             classe: 'OPA',
             tipo: 'NULO',
@@ -742,6 +828,7 @@ describe('Testing lexer', () => {
             start: { line: 25, column: 6 },
             end: { line: 25, column: 6 }
           },
+
           {
             classe: 'NUM',
             tipo: 'INTEIRO',
@@ -749,6 +836,7 @@ describe('Testing lexer', () => {
             start: { line: 25, column: 7 },
             end: { line: 25, column: 7 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -756,13 +844,15 @@ describe('Testing lexer', () => {
             start: { line: 25, column: 8 },
             end: { line: 25, column: 8 }
           },
+
           {
             classe: 'escreva',
             tipo: 'escreva',
             lexema: 'escreva',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 26, column: 2 },
+            end: { line: 26, column: 8 }
           },
+
           {
             classe: 'LIT',
             tipo: 'LITERAL',
@@ -770,6 +860,7 @@ describe('Testing lexer', () => {
             start: { line: 26, column: 10 },
             end: { line: 28, column: 0 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -777,20 +868,23 @@ describe('Testing lexer', () => {
             start: { line: 28, column: 1 },
             end: { line: 28, column: 1 }
           },
+
           {
             classe: 'escreva',
             tipo: 'escreva',
             lexema: 'escreva',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 30, column: 2 },
+            end: { line: 30, column: 8 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'D',
-            start: { line: 4, column: 15 },
-            end: { line: 4, column: 15 }
+            start: { line: 30, column: 10 },
+            end: { line: 30, column: 10 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -798,13 +892,15 @@ describe('Testing lexer', () => {
             start: { line: 30, column: 11 },
             end: { line: 30, column: 11 }
           },
+
           {
             classe: 'escreva',
             tipo: 'escreva',
             lexema: 'escreva',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 31, column: 2 },
+            end: { line: 31, column: 8 }
           },
+
           {
             classe: 'LIT',
             tipo: 'LITERAL',
@@ -812,6 +908,7 @@ describe('Testing lexer', () => {
             start: { line: 31, column: 10 },
             end: { line: 32, column: 0 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -819,20 +916,23 @@ describe('Testing lexer', () => {
             start: { line: 32, column: 1 },
             end: { line: 32, column: 1 }
           },
+
           {
             classe: 'escreva',
             tipo: 'escreva',
             lexema: 'escreva',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 33, column: 2 },
+            end: { line: 33, column: 8 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'C',
-            start: { line: 5, column: 9 },
-            end: { line: 5, column: 9 }
+            start: { line: 33, column: 10 },
+            end: { line: 33, column: 10 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -840,13 +940,15 @@ describe('Testing lexer', () => {
             start: { line: 33, column: 11 },
             end: { line: 33, column: 11 }
           },
+
           {
             classe: 'escreva',
             tipo: 'escreva',
             lexema: 'escreva',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 34, column: 2 },
+            end: { line: 34, column: 8 }
           },
+
           {
             classe: 'LIT',
             tipo: 'LITERAL',
@@ -854,6 +956,7 @@ describe('Testing lexer', () => {
             start: { line: 34, column: 10 },
             end: { line: 35, column: 0 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -861,20 +964,23 @@ describe('Testing lexer', () => {
             start: { line: 35, column: 1 },
             end: { line: 35, column: 1 }
           },
+
           {
             classe: 'escreva',
             tipo: 'escreva',
             lexema: 'escreva',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 36, column: 2 },
+            end: { line: 36, column: 8 }
           },
+
           {
             classe: 'ID',
             tipo: 'NULO',
             lexema: 'A',
-            start: { line: 3, column: 12 },
-            end: { line: 3, column: 12 }
+            start: { line: 36, column: 10 },
+            end: { line: 36, column: 10 }
           },
+
           {
             classe: 'PT_V',
             tipo: 'NULO',
@@ -882,13 +988,15 @@ describe('Testing lexer', () => {
             start: { line: 36, column: 11 },
             end: { line: 36, column: 11 }
           },
+
           {
             classe: 'fim',
             tipo: 'fim',
             lexema: 'fim',
-            start: { line: -1, column: -1 },
-            end: { line: -1, column: -1 }
+            start: { line: 37, column: 2 },
+            end: { line: 37, column: 4 }
           },
+
           {
             classe: 'EOF',
             tipo: 'NULO',
@@ -1012,4 +1120,65 @@ describe('Testing lexer', () => {
 
     testExamples(examples)
   })
+
+  /*
+   *  test('code with error', () => {
+   *    const example: Examples = [
+   *      {
+   *        source: `escreva "\nB=\n;
+   *  escreva D;
+   *  escreva "\n";
+   *  escreva C;
+   *  escreva "\n";
+   *  escreva A;
+   *fim
+   *      `,
+   *        expectedTokens: [
+   *          {
+   *            classe: 'ERROR',
+   *            lexema: '123.0e-1abcd',
+   *            tipo: 'NULO',
+   *            start: { line: 1, column: 65 },
+   *            end: { line: 1, column: 76 },
+   *            description: 'Erro caractere inesperado, linha: 1 e coluna: 65'
+   *          },
+   *          {
+   *            classe: 'ERROR',
+   *            lexema: '123.0e-1abcd',
+   *            tipo: 'NULO',
+   *            start: { line: 1, column: 65 },
+   *            end: { line: 1, column: 76 },
+   *            description: 'Erro caractere inesperado, linha: 1 e coluna: 65'
+   *          },
+   *          {
+   *            classe: 'ERROR',
+   *            lexema: '123.0e-1abcd',
+   *            tipo: 'NULO',
+   *            start: { line: 1, column: 65 },
+   *            end: { line: 1, column: 76 },
+   *            description: 'Erro caractere inesperado, linha: 1 e coluna: 65'
+   *          },
+   *          {
+   *            classe: 'ERROR',
+   *            lexema: '123.0e-1abcd',
+   *            tipo: 'NULO',
+   *            start: { line: 1, column: 65 },
+   *            end: { line: 1, column: 76 },
+   *            description: 'Erro caractere inesperado, linha: 1 e coluna: 65'
+   *          },
+   *          {
+   *            classe: 'ERROR',
+   *            lexema: '123.0e-1abcd',
+   *            tipo: 'NULO',
+   *            start: { line: 1, column: 65 },
+   *            end: { line: 1, column: 76 },
+   *            description: 'Erro caractere inesperado, linha: 1 e coluna: 65'
+   *          }
+   *        ]
+   *      }
+   *    ]
+   *
+   *    testExamples(example)
+   *  })
+   */
 })

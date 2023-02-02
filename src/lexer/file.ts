@@ -2,7 +2,11 @@ import path from 'path'
 import { readFileSync } from 'fs'
 import { Reader, ReaderConstructor } from './file.types'
 
-const readFile = (path: string) => readFileSync(path, 'utf-8').split('')
+const readFile = (path: string) =>
+  readFileSync(path, 'utf-8')
+    .replace(/\\n/g, '\n')
+    .replace(/\\t/g, '\t')
+    .split('')
 
 const Reader: ReaderConstructor = (pathString: string) => {
   if (path.extname(pathString) != '.alg') {

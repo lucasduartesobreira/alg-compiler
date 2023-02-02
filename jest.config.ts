@@ -10,6 +10,7 @@ const config: Config = {
   moduleNameMapper: { '^@/(.*)/(.*)$': '<rootDir>/src/$1/$2' },
   collectCoverageFrom: [
     'src/**/*.ts',
+    '!src/index.ts',
     '!src/**/*.types.ts',
     '!src/utils/types.ts',
     '!**/node_modules/**'
