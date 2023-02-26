@@ -20,7 +20,7 @@ const testExample = (example: Example) => {
   const reader = Reader(`path/with/content/${fileName}`)
   const lexer = Lexer(reader)
   try {
-    const rulesReduced = Parser.parse(lexer)
+    const { rulesPrinted: rulesReduced } = Parser.parse(lexer)
 
     for (
       let reductionNumber = 0;

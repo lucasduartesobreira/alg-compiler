@@ -33,7 +33,7 @@ const panicSync: Array<NonTerminals> = [
 const createPanicHandler =
   (useLastToken?: boolean) => (context: ErrorContext) => {
     printMessage(useLastToken)(context)
-    const { stack, a, lexer, rulesPrinted, lastToken } = context
+    const { stack, a, lexer, rulesPrinted, lastToken, semanticStack } = context
     let newA = a
 
     while (stack.length > 0) {
@@ -55,7 +55,7 @@ const createPanicHandler =
         do {
           if (FOLLOW_TABLE.get(gotoSyncRule)?.has(newA.classe)) {
             stack.push(stateGotoTable.get(gotoSyncRule) as number)
-            return { stack, a: newA, rulesPrinted, lastToken }
+            return { stack, a: newA, rulesPrinted, lastToken, semanticStack }
           }
           newA = lexer.scanner()
           EOFCount += newA.classe === 'EOF' ? 1 : 0
@@ -70,22 +70,21 @@ const createPanicHandler =
 const createPhraseHandler =
   (listOfActions: Array<(context: ErrorContext) => ParsingContext>) =>
   (context: ErrorContext): UpdatedParsingContext => {
-    const { stack, a, rulesPrinted, lastToken } = listOfActions.reduce(
-      (ctx, action) => {
+    const { stack, a, rulesPrinted, lastToken, semanticStack } =
+      listOfActions.reduce((ctx, action) => {
         const newParsingContext = action(ctx)
         return {
           ...newParsingContext,
           error: context.error
         }
-      },
-      context
-    )
+      }, context)
 
     return {
       stack,
       a,
       rulesPrinted,
-      lastToken
+      lastToken,
+      semanticStack
     }
   }
 
@@ -93,7 +92,7 @@ const makeAReduce =
   (identifier: number, replaceA?: Pick<Token, 'classe' | 'lexema' | 'tipo'>) =>
   (context: ErrorContext) => {
     let { stack } = context
-    const { rulesPrinted, lastToken } = context
+    const { rulesPrinted, lastToken, semanticStack } = context
 
     const amountToPop = POP_AMOUNT_PER_RULE.get(identifier) as number
     stack = stack.slice(0, -amountToPop)
@@ -109,7 +108,14 @@ const makeAReduce =
 
     const newA = { ...context.a, ...replaceA }
 
-    return { stack, a: newA, rulesPrinted, lexer: context.lexer, lastToken }
+    return {
+      stack,
+      a: newA,
+      rulesPrinted,
+      lexer: context.lexer,
+      lastToken,
+      semanticStack
+    }
   }
 
 const popFromStack = (state: number) => (context: ErrorContext) => {

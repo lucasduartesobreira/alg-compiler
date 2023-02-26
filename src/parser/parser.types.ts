@@ -2,7 +2,10 @@ import { State, TypeofToken } from '@/lexer/automata.types'
 import { Lexer, ReservedWords } from '@/lexer/lexer.types'
 
 interface Parser {
-  parse(lexer: Lexer): string[] //Possibly return a AST
+  parse(lexer: Lexer): {
+    rulesPrinted: string[]
+    object: { textObject: string; shouldCreateOBJ: boolean }
+  } //Possibly return a AST
 }
 
 type Action = {

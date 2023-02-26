@@ -27,7 +27,8 @@ const Lexer: LexerConstructor = (reader: Reader) => {
       state: 0,
       start: { line: 0, column: 0 },
       end: { line: 0, column: 0 }
-    })
+    }),
+    getSymbolTable: () => symbols
   }
 }
 

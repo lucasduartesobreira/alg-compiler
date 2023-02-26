@@ -25,8 +25,11 @@ type Token = {
   description?: string
 }
 
+type SymbolTable = Map<Lexema, Token>
+
 type Lexer = {
   scanner(): Token
+  getSymbolTable(): SymbolTable
 }
 
 type LexerConstructor = (reader: Reader) => Lexer
