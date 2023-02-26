@@ -9,6 +9,9 @@
   "private": true,
   "scripts": {
     "test": "jest",
+    "test:lexer": "jest lexer",
+    "test:parser": "jest parser",
+    "test:semantic": "jest semantic",
     "test:coverage": "jest --coverage",
     "lint": "eslint src/**/*.ts"
   },
