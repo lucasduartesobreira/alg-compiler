@@ -34,4 +34,4 @@ type Lexer = {
 
 type LexerConstructor = (reader: Reader) => Lexer
 
-export { Lexer, LexerConstructor, Lexema, Token, ReservedWords }
+export { Lexer, LexerConstructor, Lexema, Token, ReservedWords, SymbolTable }
