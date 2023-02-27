@@ -1,8 +1,7 @@
 import { TypeofToken } from '@/lexer/automata.types'
-import { ReservedWords, Token } from '@/lexer/lexer.types'
+import { ReservedWords, SymbolTable, Token } from '@/lexer/lexer.types'
 import { NonTerminals } from 'src/parser/parser.types'
 import {
-  Executioner,
   RuleIndex,
   SemanticContext,
   SemanticRules
@@ -24,55 +23,43 @@ const makePrinter =
     return context
   }
 
-const assignTypeFromLastNonTerminal =
-  (nonTerminal: NonTerminals, offset = 1) =>
-  (context: SemanticContext) => {
-    if (context.semanticStack.length === 0)
-      throw `Error no semântico, utilizando pilha vazia`
+const assignTypeFromLastNonTerminal = (nonTerminal: NonTerminals, offset = 1) =>
+  verifyIdAlreadyDefined(
+    offset,
+    (ctx, node) => {
+      if (node.classe !== 'ID') {
+        throw 'Erro no semântico, tentando adicionar tipo fora de um identificador'
+      }
 
-    const lastTerminal = context.semanticStack.reduceRight<
-      | (Omit<Token, 'classe'> & {
-          classe: TypeofToken | ReservedWords | NonTerminals
-        })
-      | undefined
-    >(
-      (acc, value) =>
-        value.classe.toUpperCase() === nonTerminal ? value : acc,
-      undefined
-    )
+      const { semanticStack } = ctx
+      const lastTerminal = semanticStack.reduceRight<
+        | (Omit<Token, 'classe'> & {
+            classe: TypeofToken | ReservedWords | NonTerminals
+          })
+        | undefined
+      >(
+        (acc, value) =>
+          value.classe.toUpperCase() === nonTerminal ? value : acc,
+        undefined
+      )
 
-    if (!lastTerminal)
-      throw `Error no semântico: não foi possivel encontrar o não terminal ${nonTerminal} na pilha`
+      if (!lastTerminal)
+        throw `Error no semântico: não foi possivel encontrar o não terminal ${nonTerminal} na pilha`
 
-    const poppedFromStack = context.semanticStack.at(-offset)
+      const newNode: Token = {
+        ...node,
+        classe: 'ID',
+        tipo: lastTerminal.tipo
+      }
 
-    if (!poppedFromStack) throw `Error no semântico, utilizando pilha vazia`
+      ctx.semanticStack[ctx.semanticStack.length - offset] = newNode
 
-    if (poppedFromStack.classe !== 'ID')
-      throw 'Erro no semântico, tentando adicionar tipo fora de um identificador'
+      ctx.symbolTable.set(node.lexema, newNode)
 
-    const idFromSymbolTable = context.symbolTable.get(poppedFromStack.lexema)
-
-    if (!idFromSymbolTable)
-      throw 'Erro no semântico, tentando adicionar tipo ao um token que não está na tabela de simbolos'
-
-    if (idFromSymbolTable.tipo !== 'NULO') {
-      console.log('Erro Semântico: variável já declarada')
-      context.shouldCreateOBJ = false
-      return context
-    }
-
-    poppedFromStack.tipo = lastTerminal.tipo
-    context.semanticStack[context.semanticStack.length - offset] =
-      poppedFromStack
-
-    context.symbolTable.set(poppedFromStack.lexema, {
-      ...poppedFromStack,
-      classe: 'ID'
-    })
-
-    return context
-  }
+      return ctx
+    },
+    buildGenericSemanticalErrorHandler('variável já declarada')
+  )
 
 const buildNewNonTerminalNode = (context: SemanticContext) => {
   const { amountToPopFromStack, ruleSymbol } = context
@@ -121,7 +108,7 @@ const joinLexemas = (amount: number) => (context: SemanticContext) => {
         ...newItem,
         lexema: newItem.lexema + currentNode.lexema,
         tipo: currentNode.tipo,
-        start: currentNode.start
+        end: currentNode.end
       }
     },
     lastOne
@@ -134,11 +121,20 @@ const popFromStack = (amount: number) => (context: SemanticContext) => {
   return { ...context, semanticStack: context.semanticStack.slice(0, -amount) }
 }
 
+type VerifyIdBranches = (
+  context: SemanticContext,
+  node: Omit<Token, 'classe'> & {
+    classe: NonTerminals | ReservedWords | TypeofToken
+  }
+) => SemanticContext
 const verifyIdAlreadyDefined =
   (
     offset: number,
-    caseFalse: Executioner,
-    caseTrue: Executioner = (context) => context
+    caseFalse: VerifyIdBranches,
+    caseTrue: VerifyIdBranches = (context) => context,
+    caseNotId: VerifyIdBranches = () => {
+      throw 'Erro no semântico, tentando utilizar identificador não presente na tabela de simbolos'
+    }
   ) =>
   (context: SemanticContext) => {
     const { semanticStack } = context
@@ -151,153 +147,178 @@ const verifyIdAlreadyDefined =
 
     const idFromSymbolTable = context.symbolTable.get(id.lexema)
 
-    if (!idFromSymbolTable)
-      throw 'Erro no semântico, tentando utilizar identificador que não presente na tabela de simbolos'
+    if (!idFromSymbolTable) return caseNotId(context, id)
 
     if (idFromSymbolTable.tipo === 'NULO') {
-      return caseFalse(context)
+      return caseFalse(context, id)
     }
 
-    return caseTrue(context)
+    return caseTrue(context, { ...id, tipo: idFromSymbolTable.tipo })
   }
+
+const createTempVariableName = (
+  oprdOne: Omit<Token, 'classe'> & {
+    classe: NonTerminals | ReservedWords | TypeofToken
+  },
+  lastX: number,
+  symbolTable: SymbolTable
+): { identifier: string; type: 'int' | 'double' | 'literal' } => {
+  const numberOfTs = ['t']
+
+  while (symbolTable.has(`${numberOfTs.join('')}${lastX}`)) {
+    numberOfTs.push('t')
+  }
+
+  const tempIdentifier = `${numberOfTs.join('')}${lastX}`
+  const tempType =
+    oprdOne.tipo.toLowerCase() === 'inteiro'
+      ? 'int'
+      : oprdOne.tipo.toLowerCase() === 'real'
+      ? 'double'
+      : 'literal'
+
+  return { identifier: tempIdentifier, type: tempType }
+}
+
+const buildGenericSemanticalErrorHandler: (
+  message: string
+) => VerifyIdBranches = (message) => (ctx, node) => {
+  console.log(createSemanticalErrorMessage(message, node))
+  ctx.shouldCreateOBJ = false
+  return ctx
+}
+
+const createSemanticalErrorMessage = (
+  message: string,
+  node: Omit<Token, 'classe'> & {
+    classe: NonTerminals | ReservedWords | TypeofToken
+  }
+) =>
+  `Erro Semântico: ${message}, linha: ${node.start.line}, coluna: ${node.start.column}`
 
 const rules: SemanticRules = new Map([
   [4, buildExecutioner([makePrinter('\n\n\n', []), doReduction])],
-  [5, buildExecutioner([makePrinter(' {2};\n', [[2, 'lexema']]), doReduction])],
-  [6, buildExecutioner([assignTypeFromLastNonTerminal('L', 3), doReduction])],
-  [7, buildExecutioner([assignTypeFromLastNonTerminal('TIPO'), doReduction])],
+  [
+    6,
+    buildExecutioner([
+      assignTypeFromLastNonTerminal('L', 3),
+      verifyIdAlreadyDefined(
+        3,
+        buildGenericSemanticalErrorHandler('variável já declarada'),
+        (ctx, node) => {
+          if (node.tipo.toLowerCase() === 'literal')
+            return makePrinter('literal {3};\n', [[3, 'lexema']])(ctx)
+          if (node.tipo.toLowerCase() === 'inteiro')
+            return makePrinter('int {3};\n', [[3, 'lexema']])(ctx)
+          if (node.tipo.toLowerCase() === 'real')
+            return makePrinter('double {3};\n', [[3, 'lexema']])(ctx)
+
+          throw 'Erro no semântico, atribuindo tipo impossível'
+        }
+      ),
+      doReduction
+    ])
+  ],
+  [
+    7,
+    buildExecutioner([
+      assignTypeFromLastNonTerminal('TIPO'),
+      makePrinter('{1};\n', [[1, 'lexema']]),
+      doReduction
+    ])
+  ],
   [8, buildExecutioner([doReduction, makePrinter('int', [])])],
   [9, buildExecutioner([doReduction, makePrinter('double', [])])],
   [10, buildExecutioner([doReduction, makePrinter('{1}', [[1, 'tipo']])])],
   [
     12,
     buildExecutioner([
-      (context) => {
-        const { semanticStack } = context
+      verifyIdAlreadyDefined(
+        2,
+        buildGenericSemanticalErrorHandler('variável não declarada'),
+        (ctx, node) => {
+          if (node.tipo.toLowerCase() === 'literal') {
+            return makePrinter('scanf("%s", {2});\n', [[2, 'lexema']])(ctx)
+          } else if (node.tipo.toLowerCase() === 'inteiro') {
+            return makePrinter('scanf("%d", &{2});\n', [[2, 'lexema']])(ctx)
+          } else if (node.tipo.toLowerCase() === 'real') {
+            return makePrinter('scanf("%lf", &{2});\n', [[2, 'lexema']])(ctx)
+          }
 
-        const id = semanticStack.at(-2)
-
-        if (!id) {
-          throw 'Erro no semântico, pilha semantica extrapolada'
+          throw 'Erro no semântico, identificador com tipo impossível'
         }
-
-        const idFromSymbolTable = context.symbolTable.get(id.lexema)
-
-        if (!idFromSymbolTable)
-          throw 'Erro no semântico, tentando utilizar identificador que não presente na tabela de simbolos'
-
-        if (idFromSymbolTable.tipo === 'NULO') {
-          console.log(
-            `Erro Semântico: variável não declarada, linha: ${id.start.line}, coluna: ${id.start.column}`
-          )
-          context.shouldCreateOBJ = false
-          return context
-        }
-
-        if (id.tipo.toLowerCase() === 'literal') {
-          return makePrinter('scanf("%s", {2});\n', [[2, 'lexema']])(context)
-        } else if (id.tipo.toLowerCase() === 'inteiro') {
-          return makePrinter('scanf("%d", &{2});\n', [[2, 'lexema']])(context)
-        } else if (id.tipo.toLowerCase() === 'real') {
-          return makePrinter('scanf("%lf", &{2});\n', [[2, 'lexema']])(context)
-        }
-
-        throw 'Erro no semântico, identificador com tipo impossível'
-      },
+      ),
       doReduction
     ])
   ],
   [
     13,
     buildExecutioner([
-      (context) => {
-        const { semanticStack } = context
-
-        const arg = semanticStack.at(-2)
-
-        if (!arg) throw 'Erro no semântico, pilha semantica extrapolada'
-
-        const idFromSymbolTable = context.symbolTable.get(arg.lexema)
-
-        if (!idFromSymbolTable) {
-          if (arg.tipo.toLowerCase() === 'literal') {
-            return makePrinter('printf({2});\n', [[2, 'lexema']])(context)
+      verifyIdAlreadyDefined(
+        2,
+        (ctx, node) => {
+          if (node.tipo.toLowerCase() === 'literal') {
+            return makePrinter('printf({2});\n', [[2, 'lexema']])(ctx)
           } else {
-            return makePrinter('printf("{2}");\n', [[2, 'lexema']])(context)
+            return makePrinter('printf("{2}");\n', [[2, 'lexema']])(ctx)
+          }
+        },
+        (ctx, node) => {
+          if (node.tipo.toLowerCase() === 'literal') {
+            return makePrinter('printf("%s", {2});\n', [[2, 'lexema']])(ctx)
+          } else if (node.tipo.toLowerCase() === 'inteiro') {
+            return makePrinter('printf("%d", &{2});\n', [[2, 'lexema']])(ctx)
+          } else if (node.tipo.toLowerCase() === 'real') {
+            return makePrinter('printf("%lf", &{2});\n', [[2, 'lexema']])(ctx)
+          } else {
+            return ctx
+          }
+        },
+        (ctx, node) => {
+          if (node.tipo.toLowerCase() === 'literal') {
+            return makePrinter('printf({2});\n', [[2, 'lexema']])(ctx)
+          } else {
+            return makePrinter('printf("{2}");\n', [[2, 'lexema']])(ctx)
           }
         }
-
-        if (idFromSymbolTable.tipo.toLowerCase() === 'literal') {
-          return makePrinter('printf("%s", {2});\n', [[2, 'lexema']])(context)
-        } else if (idFromSymbolTable.tipo.toLowerCase() === 'inteiro') {
-          return makePrinter('printf("%d", &{2});\n', [[2, 'lexema']])(context)
-        } else if (idFromSymbolTable.tipo.toLowerCase() === 'real') {
-          return makePrinter('printf("%lf", &{2});\n', [[2, 'lexema']])(context)
-        } else {
-          return context
-        }
-      },
+      ),
       doReduction
     ])
   ],
   [
     16,
     buildExecutioner([
-      (context) => {
-        const { semanticStack, symbolTable } = context
-
-        const arg = semanticStack.at(-1)
-
-        if (!arg) throw 'Erro no semântico, pilha semantica extrapolada'
-
-        const idFromSymbolTable = symbolTable.get(arg.lexema)
-
-        if (!idFromSymbolTable)
-          throw 'Erro no semântico, tentando utilizar identificador que não presente na tabela de simbolos'
-
-        if (idFromSymbolTable.tipo.toUpperCase() === 'NULO') {
-          console.log(
-            `Erro Semântico: variável não declarada, linha: ${arg.start.line}, coluna: ${arg.start.column}`
-          )
-        }
-
-        return context
-      },
+      verifyIdAlreadyDefined(
+        1,
+        buildGenericSemanticalErrorHandler('variável não declarada')
+      ),
       doReduction
     ])
   ],
   [
     18,
     buildExecutioner([
-      (context) => {
-        const { semanticStack, symbolTable } = context
+      verifyIdAlreadyDefined(
+        4,
+        buildGenericSemanticalErrorHandler('variável não declarada'),
+        (ctx, node) => {
+          const { semanticStack } = ctx
+          const ld = semanticStack.at(-2)
 
-        const id = semanticStack.at(-4)
+          if (!ld) throw 'Erro no semântico, pilha semantica extrapolada'
 
-        if (!id) throw 'Erro no semântico, pilha semantica extrapolada'
+          if (ld.tipo.toLowerCase() !== node.tipo.toLowerCase()) {
+            buildGenericSemanticalErrorHandler(
+              'tipos diferentes para atribuição'
+            )(ctx, node)
+          }
 
-        const idFromSymbolTable = symbolTable.get(id.lexema)
-
-        if (!idFromSymbolTable)
-          throw 'Erro no semântico, tentando utilizar identificador que não presente na tabela de simbolos'
-
-        if (idFromSymbolTable.tipo === 'NULO')
-          console.log(
-            `Erro Semântico: variável não declarada, linha: ${id.start.line}, coluna: ${id.start.column}`
-          )
-
-        const ld = semanticStack.at(-2)
-
-        if (!ld) throw 'Erro no semântico, pilha semantica extrapolada'
-
-        if (ld.tipo.toLowerCase() !== id.tipo.toLowerCase())
-          throw `Erro Semântico: tipos diferentes para atribuição, linha: ${id.start.line}, coluna: ${id.start.column}`
-
-        return makePrinter('{4} = {2};\n', [
-          [4, 'lexema'],
-          [2, 'lexema']
-        ])(context)
-      },
+          return makePrinter('{4} = {2};\n', [
+            [4, 'lexema'],
+            [2, 'lexema']
+          ])(ctx)
+        }
+      ),
       doReduction
     ])
   ],
@@ -317,29 +338,16 @@ const rules: SemanticRules = new Map([
           oprdOne.tipo.toLowerCase() !== oprdTwo.tipo.toLowerCase() ||
           oprdOne.tipo.toLowerCase() === 'literal' ||
           oprdTwo.tipo.toLowerCase() === 'literal'
-        )
-          throw `Erro Semântico: Operandos incompativeis, linha: ${oprdOne.start.line}, coluna: ${oprdOne.start.column}`
-
-        const numberOfTs = ['t']
-
-        while (symbolTable.has(`${numberOfTs.join('')}${lastX}`)) {
-          numberOfTs.push('t')
+        ) {
+          return buildGenericSemanticalErrorHandler(
+            'Operandos com tipos incompativeis'
+          )(context, oprdOne)
         }
 
-        const tempIdentifier = `${numberOfTs.join('')}${lastX}`
-        const tempType =
-          oprdOne.tipo.toLowerCase() === 'inteiro'
-            ? 'int'
-            : oprdOne.tipo.toLowerCase() === 'real'
-            ? 'double'
-            : 'literal'
+        const tempVariable = createTempVariableName(oprdOne, lastX, symbolTable)
+        context.temporaryVariables.set(lastX, tempVariable)
 
-        context.temporaryVariables.set(lastX, {
-          identifier: tempIdentifier,
-          type: tempType
-        })
-
-        return makePrinter(`${numberOfTs.join('')}${lastX} = {3} {2} {1};\n`, [
+        return makePrinter(`${tempVariable.identifier} = {3} {2} {1};\n`, [
           [3, 'lexema'],
           [2, 'lexema'],
           [1, 'lexema']
@@ -365,30 +373,10 @@ const rules: SemanticRules = new Map([
   [
     21,
     buildExecutioner([
-      (context) => {
-        const { semanticStack, symbolTable } = context
-
-        const id = semanticStack.at(-1)
-
-        if (!id) throw 'Erro no semântico, pilha semantica extrapolada'
-
-        const idFromSymbolTable = symbolTable.get(id.lexema)
-
-        if (!idFromSymbolTable)
-          throw 'Erro no semântico, tentando utilizar identificador que não presente na tabela de simbolos'
-
-        if (idFromSymbolTable.tipo === 'NULO')
-          console.log(
-            `Erro Semântico: variável não declarada, linha: ${id.start.line}, coluna: ${id.start.column}`
-          )
-
-        semanticStack[semanticStack.length - 1] = {
-          ...id,
-          tipo: idFromSymbolTable.tipo
-        }
-
-        return { ...context, semanticStack }
-      },
+      verifyIdAlreadyDefined(
+        1,
+        buildGenericSemanticalErrorHandler('variável não declarada')
+      ),
       doReduction
     ])
   ],
@@ -425,29 +413,16 @@ const rules: SemanticRules = new Map([
           oprdOneAndOprdTwo.every(
             (value, index) => value === ['real', 'literal'][index]
           )
-        )
-          throw `Erro Semântico: Operandos incompativeis, linha: ${oprdOne.start.line}, coluna: ${oprdOne.start.column}`
-
-        const numberOfTs = ['t']
-
-        while (symbolTable.has(`${numberOfTs.join('')}${lastX}`)) {
-          numberOfTs.push('t')
+        ) {
+          return buildGenericSemanticalErrorHandler(
+            'Operandos com tipos incompatíveis'
+          )(context, oprdOne)
         }
 
-        const tempIdentifier = `${numberOfTs.join('')}${lastX}`
-        const tempType =
-          oprdOne.tipo.toLowerCase() === 'inteiro'
-            ? 'int'
-            : oprdOne.tipo.toLowerCase() === 'real'
-            ? 'double'
-            : 'literal'
+        const tempVariable = createTempVariableName(oprdOne, lastX, symbolTable)
+        context.temporaryVariables.set(lastX, tempVariable)
 
-        context.temporaryVariables.set(lastX, {
-          identifier: tempIdentifier,
-          type: tempType
-        })
-
-        return makePrinter(`${numberOfTs.join('')}${lastX} = {3} {2} {1};\n`, [
+        return makePrinter(`${tempVariable.identifier} = {3} {2} {1};\n`, [
           [3, 'lexema'],
           [2, 'lexema'],
           [1, 'lexema']
@@ -484,4 +459,4 @@ const SemanticAnalyzer = {
   }
 }
 
-export { SemanticAnalyzer }
+export { SemanticAnalyzer, doReduction }

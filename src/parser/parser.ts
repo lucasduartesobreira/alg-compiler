@@ -79,19 +79,41 @@ const Parser: Parser = {
       } else if (action?.action === 'ACCEPT') {
         break
       } else if (action?.action === 'ERROR') {
+        shouldCreateOBJ = false
         const updatedContext = ErrorHandler.handle(action.identifier, {
           stack,
           a,
           lexer,
           rulesPrinted,
           lastToken,
-          semanticStack: nodeStack
+          semanticContext: {
+            lastX,
+            semanticStack: nodeStack,
+            ruleIndex: action.identifier,
+            textObject,
+            amountToPopFromStack: 0,
+            ruleSymbol: 'P',
+            symbolTable: lexer.getSymbolTable(),
+            temporaryVariables,
+            shouldCreateOBJ
+          }
         })
+
         stack = updatedContext.stack
         a = updatedContext.a
         rulesPrinted = updatedContext.rulesPrinted
+        lastToken = updatedContext.lastToken
+
+        const { semanticContext: updatedSemanticContext } = updatedContext
+
+        lastX = updatedSemanticContext.lastX
+        nodeStack = updatedSemanticContext.semanticStack
+        textObject = updatedSemanticContext.textObject
+        temporaryVariables = updatedSemanticContext.temporaryVariables
+        shouldCreateOBJ = updatedSemanticContext.shouldCreateOBJ
       } else {
         if (a.classe === 'ERROR') {
+          shouldCreateOBJ = false
           console.log(
             `Erro Léxico: ${
               a.description ?? 'token escrito de maneira incorreta'

@@ -19,26 +19,21 @@ const testExample = (example: Example) => {
 
   const reader = Reader(`path/with/content/${fileName}`)
   const lexer = Lexer(reader)
-  try {
-    const { object } = Parser.parse(lexer)
+  const { object } = Parser.parse(lexer)
 
-    const { textObject, shouldCreateOBJ } = object
+  const { textObject, shouldCreateOBJ } = object
 
-    expect(shouldCreateOBJ).toBe(example.expectedShouldCreateOBJ)
+  expect(shouldCreateOBJ).toBe(example.expectedShouldCreateOBJ)
 
-    if (shouldCreateOBJ) {
-      const splittedResult = textObject
-        .split(/\s/)
-        .filter((value) => value !== '')
+  if (example.expectedShouldCreateOBJ || example.expectedSequence != null) {
+    const splittedResult = textObject
+      .split(/\s/)
+      .filter((value) => value !== '')
 
-      console.log(textObject)
-      expect(splittedResult).toStrictEqual(example.expectedSequence)
-    }
-
-    mock.restore()
-  } catch (e: any) {
-    console.log(e)
+    expect(splittedResult).toStrictEqual(example.expectedSequence)
   }
+
+  mock.restore()
 }
 
 describe('Testing Semantic Analyzer', () => {
@@ -77,11 +72,23 @@ describe('Testing Semantic Analyzer', () => {
           'main(void)',
           '{',
           'literal',
-          'A,B;',
+          'B;',
+          'literal',
+          'A;',
           'int',
-          'E,D,C;',
+          'C;',
+          'int',
+          'D;',
+          'int',
+          'E;',
           'double',
-          'I,H,G,F;',
+          'F;',
+          'double',
+          'G;',
+          'double',
+          'H;',
+          'double',
+          'I;',
           '}'
         ],
         expectedShouldCreateOBJ: true
@@ -151,11 +158,17 @@ describe('Testing Semantic Analyzer', () => {
           'main(void)',
           '{',
           'literal',
-          'A,B;',
+          'B;',
+          'literal',
+          'A;',
           'int',
-          'C,D;',
+          'D;',
+          'int',
+          'C;',
           'double',
-          'E,F;',
+          'F;',
+          'double',
+          'E;',
           'scanf("%s",',
           'A);',
           'printf("%s",',
@@ -389,7 +402,9 @@ fim`,
           'literal',
           'A;',
           'int',
-          'B,D;',
+          'D;',
+          'int',
+          'B;',
           'double',
           'C;',
           'printf("Digite',
@@ -490,8 +505,57 @@ fim`,
     test('Test use uncreated variable', () => {
       const example: Example = {
         source: 'inicio varinicio varfim; leia A; escreva A; fim',
-        expectedSequence: [],
         expectedShouldCreateOBJ: false
+      }
+
+      testExample(example)
+    })
+
+    test('Test comparation between different types', () => {
+      const example: Example = {
+        source:
+          'inicio varinicio inteiro A; literal B; varfim; se (A < B) entao fimse fim',
+        expectedSequence: [
+          'int',
+          'A;',
+          'literal',
+          'B;',
+          'if',
+          '(t0)',
+          '{',
+          '}'
+        ],
+        expectedShouldCreateOBJ: false
+      }
+
+      testExample(example)
+    })
+
+    test('Test fixing ; and creating the same code', () => {
+      const example: Example = {
+        source: `inicio
+varinicio
+literal A,
+inteiro B, C, D,
+varfim;
+leia A,
+escreva A,
+fim`,
+        expectedShouldCreateOBJ: false,
+        expectedSequence: [
+          'literal',
+          'A;',
+          'int',
+          'D;',
+          'int',
+          'C;',
+          'int',
+          'B;',
+          'scanf("%s",',
+          'A);',
+          'printf("%s",',
+          'A);'
+        ]
       }
 
       testExample(example)

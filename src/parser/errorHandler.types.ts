@@ -1,6 +1,6 @@
 import { State } from '@/lexer/automata.types'
 import { Lexer, Token } from '@/lexer/lexer.types'
-import { NodeStack } from 'src/semantic/semanticRules.types'
+import { SemanticContext } from 'src/semantic/semanticRules.types'
 
 type ParsingContext = {
   stack: Array<State>
@@ -8,7 +8,7 @@ type ParsingContext = {
   lexer: Lexer
   rulesPrinted: Array<string>
   lastToken: Token
-  semanticStack: NodeStack
+  semanticContext: SemanticContext
 }
 
 type UpdatedParsingContext = Omit<ParsingContext, 'lexer'>
