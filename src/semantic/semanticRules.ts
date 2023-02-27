@@ -381,7 +381,13 @@ const rules: SemanticRules = new Map([
     ])
   ],
   [24, buildExecutioner([makePrinter('}\n', []), doReduction])],
-  [25, buildExecutioner([makePrinter('if ({3}) {\n', [[3, 'lexema']])])],
+  [
+    25,
+    buildExecutioner([
+      makePrinter('if ({3}) {\n', [[3, 'lexema']]),
+      doReduction
+    ])
+  ],
   [
     26,
     buildExecutioner([
