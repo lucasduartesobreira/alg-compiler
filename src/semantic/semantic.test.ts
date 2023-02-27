@@ -46,7 +46,18 @@ describe('Testing Semantic Analyzer', () => {
     test('test just one literal', () => {
       const example: Example = {
         source: 'inicio varinicio literal A; varfim; fim',
-        expectedSequence: ['literal', 'A;'],
+        expectedSequence: [
+          '#include<stdio.h>',
+          'typedef',
+          'char',
+          'literal[256];',
+          'void',
+          'main(void)',
+          '{',
+          'literal',
+          'A;',
+          '}'
+        ],
         expectedShouldCreateOBJ: true
       }
 
@@ -58,12 +69,20 @@ describe('Testing Semantic Analyzer', () => {
         source:
           'inicio varinicio literal A, B; inteiro E, D, C; real I, H, G, F; varfim; fim',
         expectedSequence: [
+          '#include<stdio.h>',
+          'typedef',
+          'char',
+          'literal[256];',
+          'void',
+          'main(void)',
+          '{',
           'literal',
           'A,B;',
           'int',
           'E,D,C;',
           'double',
-          'I,H,G,F;'
+          'I,H,G,F;',
+          '}'
         ],
         expectedShouldCreateOBJ: true
       }
@@ -74,7 +93,20 @@ describe('Testing Semantic Analyzer', () => {
     test('test just read to id', () => {
       const example: Example = {
         source: 'inicio varinicio literal A; varfim; leia A; fim',
-        expectedSequence: ['literal', 'A;', 'scanf("%s",', 'A);'],
+        expectedSequence: [
+          '#include<stdio.h>',
+          'typedef',
+          'char',
+          'literal[256];',
+          'void',
+          'main(void)',
+          '{',
+          'literal',
+          'A;',
+          'scanf("%s",',
+          'A);',
+          '}'
+        ],
         expectedShouldCreateOBJ: true
       }
 
@@ -85,12 +117,20 @@ describe('Testing Semantic Analyzer', () => {
       const example: Example = {
         source: 'inicio varinicio literal A; varfim; leia A; escreva A; fim',
         expectedSequence: [
+          '#include<stdio.h>',
+          'typedef',
+          'char',
+          'literal[256];',
+          'void',
+          'main(void)',
+          '{',
           'literal',
           'A;',
           'scanf("%s",',
           'A);',
           'printf("%s",',
-          'A);'
+          'A);',
+          '}'
         ],
         expectedShouldCreateOBJ: true
       }
@@ -103,6 +143,13 @@ describe('Testing Semantic Analyzer', () => {
         source:
           'inicio varinicio literal A, B; inteiro C, D; real E, F; varfim; leia A; escreva A; leia B; escreva B; leia C; escreva C; leia D; escreva D; leia E; escreva E; leia F; escreva F;fim',
         expectedSequence: [
+          '#include<stdio.h>',
+          'typedef',
+          'char',
+          'literal[256];',
+          'void',
+          'main(void)',
+          '{',
           'literal',
           'A,B;',
           'int',
@@ -132,7 +179,8 @@ describe('Testing Semantic Analyzer', () => {
           'scanf("%lf",',
           '&F);',
           'printf("%lf",',
-          '&F);'
+          '&F);',
+          '}'
         ],
         expectedShouldCreateOBJ: true
       }
@@ -144,7 +192,20 @@ describe('Testing Semantic Analyzer', () => {
       const example: Example = {
         source:
           'inicio varinicio varfim; escreva "É um literal"; escreva 1234; fim',
-        expectedSequence: ['printf("É', 'um', 'literal");', 'printf("1234");'],
+        expectedSequence: [
+          '#include<stdio.h>',
+          'typedef',
+          'char',
+          'literal[256];',
+          'void',
+          'main(void)',
+          '{',
+          'printf("É',
+          'um',
+          'literal");',
+          'printf("1234");',
+          '}'
+        ],
         expectedShouldCreateOBJ: true
       }
 
@@ -156,6 +217,13 @@ describe('Testing Semantic Analyzer', () => {
         source:
           'inicio varinicio literal A; varfim; escreva "É um literal"; escreva 1234; leia A; escreva A;fim',
         expectedSequence: [
+          '#include<stdio.h>',
+          'typedef',
+          'char',
+          'literal[256];',
+          'void',
+          'main(void)',
+          '{',
           'literal',
           'A;',
           'printf("É',
@@ -165,7 +233,8 @@ describe('Testing Semantic Analyzer', () => {
           'scanf("%s",',
           'A);',
           'printf("%s",',
-          'A);'
+          'A);',
+          '}'
         ],
         expectedShouldCreateOBJ: true
       }
@@ -178,6 +247,17 @@ describe('Testing Semantic Analyzer', () => {
         source:
           'inicio varinicio inteiro A; varfim; escreva "É um literal"; escreva 1234; leia A; escreva A; se (A<= 5) entao escreva "Literal aqui"; se (A > 2) entao escreva "Outro literal"; fimse fimse fim',
         expectedSequence: [
+          '#include<stdio.h>',
+          'typedef',
+          'char',
+          'literal[256];',
+          'void',
+          'main(void)',
+          '{',
+          'int',
+          't0;',
+          'int',
+          't1;',
           'int',
           'A;',
           'printf("É',
@@ -209,6 +289,7 @@ describe('Testing Semantic Analyzer', () => {
           'printf("Outro',
           'literal");',
           '}',
+          '}',
           '}'
         ],
         expectedShouldCreateOBJ: true
@@ -222,6 +303,15 @@ describe('Testing Semantic Analyzer', () => {
         source:
           'inicio varinicio inteiro A; inteiro B; varfim; leia A; B <- A + 1; A <- B; fim',
         expectedSequence: [
+          '#include<stdio.h>',
+          'typedef',
+          'char',
+          'literal[256];',
+          'void',
+          'main(void)',
+          '{',
+          'int',
+          't0;',
           'int',
           'A;',
           'int',
@@ -238,7 +328,8 @@ describe('Testing Semantic Analyzer', () => {
           't0;',
           'A',
           '=',
-          'B;'
+          'B;',
+          '}'
         ],
         expectedShouldCreateOBJ: true
       }
@@ -278,6 +369,23 @@ describe('Testing Semantic Analyzer', () => {
   escreva A;
 fim`,
         expectedSequence: [
+          '#include<stdio.h>',
+          'typedef',
+          'char',
+          'literal[256];',
+          'void',
+          'main(void)',
+          '{',
+          'int',
+          't0;',
+          'int',
+          't1;',
+          'int',
+          't2;',
+          'int',
+          't3;',
+          'int',
+          't4;',
           'literal',
           'A;',
           'int',
@@ -358,7 +466,8 @@ fim`,
           'printf("',
           '");',
           'printf("%s",',
-          'A);'
+          'A);',
+          '}'
         ],
         expectedShouldCreateOBJ: true
       }

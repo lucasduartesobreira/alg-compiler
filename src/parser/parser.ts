@@ -106,6 +106,40 @@ const Parser: Parser = {
       }
     }
 
+    if (shouldCreateOBJ) {
+      const tempVariablesTextObject = Array.from(
+        temporaryVariables.values()
+      ).reduce(
+        (previousValue, currentValue) =>
+          previousValue.concat(
+            ` ${currentValue.type} ${currentValue.identifier};\n`
+          ),
+        ''
+      )
+
+      const textObjectWithTempVariables = tempVariablesTextObject.concat(
+        '\n\n',
+        textObject
+      )
+
+      const textObjectWithHeaders = `#include<stdio.h>
+typedef char literal[256];
+void main(void) {
+`.concat(textObjectWithTempVariables)
+
+      const finalTextObject = textObjectWithHeaders.concat(`
+}
+`)
+
+      return {
+        rulesPrinted,
+        object: {
+          shouldCreateOBJ,
+          textObject: finalTextObject
+        }
+      }
+    }
+
     return {
       rulesPrinted,
       object: {
