@@ -1,6 +1,6 @@
 import { TypeofToken } from '@/lexer/automata.types'
 import { ReservedWords, SymbolTable, Token } from '@/lexer/lexer.types'
-import { NonTerminals } from 'src/parser/parser.types'
+import { NonTerminals } from '@/parser/parser.types'
 import {
   RuleIndex,
   SemanticContext,
