@@ -22,15 +22,11 @@ const testExample = (example: Example) => {
   try {
     const { rulesPrinted: rulesReduced } = Parser.parse(lexer)
 
-    for (
-      let reductionNumber = 0;
-      reductionNumber < rulesReduced.length;
-      reductionNumber++
-    ) {
-      const ruleNumber = example.expectedSequence[reductionNumber]
-      const fullRule = GRAMMAR_RULES.get(ruleNumber)
-      expect(fullRule).toBe(rulesReduced.at(reductionNumber))
-    }
+    const rulesExpected = example.expectedSequence.map((ruleNumber) =>
+      GRAMMAR_RULES.get(ruleNumber)
+    )
+
+    expect(rulesReduced).toStrictEqual(rulesExpected)
 
     mock.restore()
   } catch (e: any) {
