@@ -11,6 +11,7 @@ import {
 import { NonTerminals } from './parser.types'
 import {
   EXPECTED_TOKENS_PER_STATE,
+  FOLLOW_STATE_TABLE,
   FOLLOW_TABLE,
   GOTO_TABLE,
   GRAMMAR_RULES,
@@ -57,12 +58,14 @@ const createPanicHandler =
       const gotoSyncRule = panicSync.find((value) => stateGotoTable.has(value))
 
       if (gotoSyncRule) {
-        stack.push(poppedStack)
-        semanticContext.semanticStack.push(semanticPop)
         let EOFCount = 0
         do {
-          if (FOLLOW_TABLE.get(gotoSyncRule)?.has(newA.classe)) {
-            stack.push(stateGotoTable.get(gotoSyncRule) as number)
+          const gotoState = stateGotoTable.get(gotoSyncRule) as number
+          const followState = FOLLOW_STATE_TABLE.get(gotoState)
+          if (followState?.has(newA.classe)) {
+            stack.push(poppedStack)
+            semanticContext.semanticStack.push(semanticPop)
+            stack.push(gotoState)
             semanticContext.semanticStack.push({
               ...semanticPop,
               classe: gotoSyncRule,
@@ -74,8 +77,6 @@ const createPanicHandler =
           newA = lexer.scanner()
           EOFCount += newA.classe === 'EOF' ? 1 : 0
         } while (EOFCount !== 2)
-
-        throw `Erro: chegou ao final do arquivo e não foi possível terminar a recuperação do erro ${context.error}`
       }
     }
     throw 'Erro pilha vazia no panic handler'
@@ -285,7 +286,8 @@ const ERROR_TABLE: ErrorTable = new Map([
       printMessage(),
       makeAReduce(20, { tipo: 'NULO', classe: 'PT_V', lexema: ';' })
     ])
-  ]
+  ],
+  [26, createPhraseHandler([printMessage(), addToStack(35)])]
 ])
 
 const ERROR_DATA: ErrorData = new Map([
@@ -334,7 +336,11 @@ const ERROR_DATA: ErrorData = new Map([
   [22, { messageFormat: '"," utilizado incorretamente, era esperado ";"' }],
   [23, { messageFormat: '"," utilizado incorretamente, era esperado ";"' }],
   [24, { messageFormat: '"," utilizado incorretamente, era esperado ";"' }],
-  [25, { messageFormat: '"," utilizado incorretamente, era esperado ";"' }]
+  [25, { messageFormat: '"," utilizado incorretamente, era esperado ";"' }],
+  [
+    26,
+    { messageFormat: '"fim" utilizado incorretamente, era esperado "fimse"' }
+  ]
 ])
 
 const ERROR_RULES = new Map([
