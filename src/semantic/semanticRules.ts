@@ -395,9 +395,10 @@ const rules: SemanticRules = new Map([
         const { semanticStack, lastX, symbolTable } = context
 
         const oprdOne = semanticStack.at(-3)
+        const opr = semanticStack.at(-2)
         const oprdTwo = semanticStack.at(-1)
 
-        if (!oprdOne || !oprdTwo)
+        if (!oprdOne || !oprdTwo || !opr)
           throw 'Erro no semântico, pilha semantica extrapolada'
 
         const oprdOneAndOprdTwo = [
@@ -428,11 +429,15 @@ const rules: SemanticRules = new Map([
         const tempVariable = createTempVariableName(oprdOne, lastX, symbolTable)
         context.temporaryVariables.set(lastX, tempVariable)
 
-        return makePrinter(`${tempVariable.identifier} = {3} {2} {1};\n`, [
-          [3, 'lexema'],
-          [2, 'lexema'],
-          [1, 'lexema']
-        ])(context)
+        return makePrinter(
+          `${tempVariable.identifier} = {3} ${
+            opr.lexema === '<>' ? '==' : opr.lexema
+          } {1};\n`,
+          [
+            [3, 'lexema'],
+            [1, 'lexema']
+          ]
+        )(context)
       },
       doReduction,
       (context) => {
