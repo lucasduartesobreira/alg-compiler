@@ -186,6 +186,27 @@ fim`,
         testExample(exampleWithMultipleLinesAndVariables)
       })
     })
+
+    test('testing over example file with error', () => {
+      const example: Example = {
+        source: `inicio
+  varinicio
+    literal A;
+    inteiro D;
+    real C ;
+  varfim;
+  escreva "\\nB=\\n;
+  escreva D;
+  escreva "\n";
+  escreva C;
+  escreva "\n";
+  escreva A;
+fim`,
+        expectedSequence: [10, 7, 5, 8, 7, 5, 9, 7, 5, 4, 3, 3, 3, 2, 1]
+      }
+
+      testExample(example)
+    })
   })
 
   describe('error recovery e017', () => {
