@@ -1,4 +1,4 @@
-/* eslint-disable no-constant-condition */
+import { writeFileSync } from 'fs'
 import { Reader } from './lexer/file'
 import { Lexer } from './lexer/lexer'
 import { Parser } from './parser/parser'
@@ -18,10 +18,17 @@ try {
     const lexer = Lexer(reader)
 
     console.log('-------------------------------------')
-    console.log(`Reduções feitas no arquivo: ${path}`)
+    console.log(`Logs do ${path}:`)
 
-    Parser.parse(lexer)
-    console.log('Leitura de tokens finalizada')
+    const {
+      object: { shouldCreateOBJ, textObject }
+    } = Parser.parse(lexer)
+
+    if (shouldCreateOBJ) {
+      const newPath = path.replace('.alg', '.c')
+      writeFileSync(newPath, textObject)
+      console.log(`Arquivo ${newPath} criado`)
+    }
     console.log('-------------------------------------')
   }
 } catch (error) {
