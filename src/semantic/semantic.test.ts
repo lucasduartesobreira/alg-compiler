@@ -2,7 +2,6 @@ import { Reader } from '@/lexer/file'
 import { Lexer } from '@/lexer/lexer'
 import mock from 'mock-fs'
 import { Parser } from '@/parser/parser'
-import { FOLLOW_STATE_TABLE } from '@/parser/parsingTable'
 
 type Example = {
   source: string
@@ -470,17 +469,13 @@ fim`,
           'C',
           '=',
           '5.0;',
-          'printf("',
-          'B=',
-          '");',
+          'printf("\\nB=\\n");',
           'printf("%d",',
           '&D);',
-          'printf("',
-          '");',
+          'printf("\\n");',
           'printf("%lf",',
           '&C);',
-          'printf("',
-          '");',
+          'printf("\\n");',
           'printf("%s",',
           'A);',
           '}'
@@ -710,6 +705,115 @@ escreva "B:";
           '}',
           '}',
           '}'
+        ],
+        expectedShouldCreateOBJ: false
+      }
+
+      testExample(example)
+    })
+
+    test('testing over example file with error', () => {
+      const example: Example = {
+        source: `inicio
+  varinicio
+    literal A;
+    inteiro B,D;
+    real C ;
+  varfim;
+  escreva "Digite B";
+  leia B;
+  escreva "Digite A:";
+  leia A;
+  se(B>2)
+  entao
+    se(B<=4)
+    entao
+      escreva "B esta entre 2 e 4";
+    fimse
+  fimse
+  B<-B+1;
+  B<-B+2;
+  B<-B+3;
+  D<-B;
+  C<-5.0;
+  escreva "\\nB=\\n;
+  escreva D;
+  escreva "\n";
+  escreva C;
+  escreva "\n";
+  escreva A;
+fim`,
+        expectedSequence: [
+          'literal',
+          'A;',
+          'int',
+          'D;',
+          'int',
+          'B;',
+          'double',
+          'C;',
+          'printf("Digite',
+          'B");',
+          'scanf("%d",',
+          '&B);',
+          'printf("Digite',
+          'A:");',
+          'scanf("%s",',
+          'A);',
+          't0',
+          '=',
+          'B',
+          '>',
+          '2;',
+          'if',
+          '(t0)',
+          '{',
+          't1',
+          '=',
+          'B',
+          '<=',
+          '4;',
+          'if',
+          '(t1)',
+          '{',
+          'printf("B',
+          'esta',
+          'entre',
+          '2',
+          'e',
+          '4");',
+          '}',
+          '}',
+          't2',
+          '=',
+          'B',
+          '+',
+          '1;',
+          'B',
+          '=',
+          't2;',
+          't3',
+          '=',
+          'B',
+          '+',
+          '2;',
+          'B',
+          '=',
+          't3;',
+          't4',
+          '=',
+          'B',
+          '+',
+          '3;',
+          'B',
+          '=',
+          't4;',
+          'D',
+          '=',
+          'B;',
+          'C',
+          '=',
+          '5.0;'
         ],
         expectedShouldCreateOBJ: false
       }
