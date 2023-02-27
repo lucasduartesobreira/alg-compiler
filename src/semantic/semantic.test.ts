@@ -2,6 +2,7 @@ import { Reader } from '@/lexer/file'
 import { Lexer } from '@/lexer/lexer'
 import mock from 'mock-fs'
 import { Parser } from '@/parser/parser'
+import { FOLLOW_STATE_TABLE } from '@/parser/parsingTable'
 
 type Example = {
   source: string
@@ -514,7 +515,7 @@ fim`,
     test('Test comparation between different types', () => {
       const example: Example = {
         source:
-          'inicio varinicio inteiro A; literal B; varfim; se (A < B) entao fimse fim',
+          'inicio varinicio inteiro A; literal B; varfim; se (A < B) entao se (B < 123) entao fimse fimse fim',
         expectedSequence: [
           'int',
           'A;',
@@ -523,8 +524,22 @@ fim`,
           'if',
           '(t0)',
           '{',
+          'if',
+          '(t1)',
+          '{',
+          '}',
           '}'
         ],
+        expectedShouldCreateOBJ: false
+      }
+
+      testExample(example)
+    })
+
+    test('Test attribution between different types', () => {
+      const example: Example = {
+        source: 'inicio varinicio inteiro A; literal B; varfim; B<-123; fim',
+        expectedSequence: ['int', 'A;', 'literal', 'B;', 'B', '=', '123;'],
         expectedShouldCreateOBJ: false
       }
 
@@ -556,6 +571,147 @@ fim`,
           'printf("%s",',
           'A);'
         ]
+      }
+
+      testExample(example)
+    })
+
+    test('Test missing fimse', () => {
+      const example: Example = {
+        source: `inicio
+varinicio
+varfim;
+se (1 < 2) entao
+  se (2 <> 2) entao
+    se (2 <> 2) entao
+    fimse
+
+escreva "B:";
+fim`,
+        expectedSequence: [
+          't0',
+          '=',
+          '1',
+          '<',
+          '2;',
+          'if',
+          '(t0)',
+          '{',
+          't1',
+          '=',
+          '2',
+          '==',
+          '2;',
+          'if',
+          '(t1)',
+          '{',
+          't2',
+          '=',
+          '2',
+          '==',
+          '2;',
+          'if',
+          '(t2)',
+          '{',
+          '}',
+          'printf("B:");',
+          '}',
+          '}'
+        ],
+        expectedShouldCreateOBJ: false
+      }
+
+      testExample(example)
+    })
+
+    test('Test missing fimse and fim', () => {
+      const example: Example = {
+        source: `inicio
+varinicio
+varfim;
+se (1 < 2) entao
+  se (2 <> 2) entao
+    se (2 <> 2) entao
+    fimse
+
+escreva "B:";
+`,
+        expectedSequence: [
+          't0',
+          '=',
+          '1',
+          '<',
+          '2;',
+          'if',
+          '(t0)',
+          '{',
+          't1',
+          '=',
+          '2',
+          '==',
+          '2;',
+          'if',
+          '(t1)',
+          '{',
+          't2',
+          '=',
+          '2',
+          '==',
+          '2;',
+          'if',
+          '(t2)',
+          '{',
+          '}'
+        ],
+        expectedShouldCreateOBJ: false
+      }
+
+      testExample(example)
+    })
+
+    test('Test missing fimse and replace a fim with fimse', () => {
+      const example: Example = {
+        source: `inicio
+varinicio
+varfim;
+se (1 < 2) entao
+  se (2 <> 2) entao
+    se (2 <> 2) entao
+    fimse
+  fim
+
+escreva "B:";
+`,
+        expectedSequence: [
+          't0',
+          '=',
+          '1',
+          '<',
+          '2;',
+          'if',
+          '(t0)',
+          '{',
+          't1',
+          '=',
+          '2',
+          '==',
+          '2;',
+          'if',
+          '(t1)',
+          '{',
+          't2',
+          '=',
+          '2',
+          '==',
+          '2;',
+          'if',
+          '(t2)',
+          '{',
+          '}',
+          '}',
+          '}'
+        ],
+        expectedShouldCreateOBJ: false
       }
 
       testExample(example)
