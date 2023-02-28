@@ -150,7 +150,7 @@ const postProcess = (token: Token): Token | null => {
     token.description += `, linha: ${token.start.line} e coluna: ${token.start.column}`
     return token
   } else if (token.classe === 'LIT') {
-    token.lexema = token.lexema.replace('\n', '\\n').replace('\t', '\\t')
+    token.lexema = token.lexema.replaceAll('\n', '\\n').replaceAll('\t', '\\t')
   }
 
   return token
