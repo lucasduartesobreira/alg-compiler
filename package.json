@@ -13,6 +13,7 @@
     "test:parser": "jest parser",
     "test:semantic": "jest semantic",
     "test:coverage": "jest --coverage",
+    "compile": "ts-node -r tsconfig-paths/register src/index.ts",
     "lint": "eslint src/**/*.ts"
   },
   "husky": {
