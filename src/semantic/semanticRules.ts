@@ -267,9 +267,9 @@ const rules: SemanticRules = new Map([
           if (node.tipo.toLowerCase() === 'literal') {
             return makePrinter('printf("%s", {2});\n', [[2, 'lexema']])(ctx)
           } else if (node.tipo.toLowerCase() === 'inteiro') {
-            return makePrinter('printf("%d", &{2});\n', [[2, 'lexema']])(ctx)
+            return makePrinter('printf("%d", {2});\n', [[2, 'lexema']])(ctx)
           } else if (node.tipo.toLowerCase() === 'real') {
-            return makePrinter('printf("%lf", &{2});\n', [[2, 'lexema']])(ctx)
+            return makePrinter('printf("%lf", {2});\n', [[2, 'lexema']])(ctx)
           } else {
             return ctx
           }
