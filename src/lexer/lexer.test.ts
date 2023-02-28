@@ -856,7 +856,7 @@ describe('Testing lexer', () => {
           {
             classe: 'LIT',
             tipo: 'LITERAL',
-            lexema: '"\nB=\n"',
+            lexema: '"\\nB=\\n"',
             start: { line: 26, column: 10 },
             end: { line: 28, column: 0 }
           },
@@ -904,7 +904,7 @@ describe('Testing lexer', () => {
           {
             classe: 'LIT',
             tipo: 'LITERAL',
-            lexema: '"\n"',
+            lexema: '"\\n"',
             start: { line: 31, column: 10 },
             end: { line: 32, column: 0 }
           },
@@ -952,7 +952,7 @@ describe('Testing lexer', () => {
           {
             classe: 'LIT',
             tipo: 'LITERAL',
-            lexema: '"\n"',
+            lexema: '"\\n"',
             start: { line: 34, column: 10 },
             end: { line: 35, column: 0 }
           },

@@ -1,3 +1,5 @@
+import { SemanticAnalyzer } from '@/semantic/semanticRules'
+import { NodeStack } from '@/semantic/semanticRules.types'
 import { ErrorHandler } from './errorHandler'
 import { NonTerminals, Parser } from './parser.types'
 import {
@@ -15,6 +17,19 @@ const Parser: Parser = {
     let s = 0
     let rulesPrinted: string[] = []
 
+    let lastX = 0
+    let textObject = ''
+    let nodeStack: NodeStack = []
+    let temporaryVariables: Map<
+      number,
+      {
+        identifier: string
+        type: 'int' | 'double' | 'literal'
+      }
+    > = new Map()
+
+    let shouldCreateOBJ = true
+
     let lastToken = a
     while (stack.length > 0) {
       s = stack.at(-1) as number
@@ -26,6 +41,7 @@ const Parser: Parser = {
 
       if (action?.action === 'SHIFT') {
         stack.push(action.identifier)
+        nodeStack.push(a)
         lastToken = a
         a = lexer.scanner()
       } else if (action?.action === 'REDUCE') {
@@ -38,23 +54,66 @@ const Parser: Parser = {
         stack.push(GOTO_TABLE.get(t)?.get(ruleSymbol) as number)
 
         const fullRuleText = GRAMMAR_RULES.get(action.identifier) as string
-        console.log(fullRuleText)
         rulesPrinted.push(fullRuleText)
+
+        const updatedSemanticContext = SemanticAnalyzer.analyze(
+          action.identifier,
+          {
+            lastX,
+            semanticStack: nodeStack,
+            ruleIndex: action.identifier,
+            textObject,
+            amountToPopFromStack: amountToPop,
+            ruleSymbol,
+            symbolTable: lexer.getSymbolTable(),
+            temporaryVariables,
+            shouldCreateOBJ
+          }
+        )
+
+        lastX = updatedSemanticContext.lastX
+        nodeStack = updatedSemanticContext.semanticStack
+        textObject = updatedSemanticContext.textObject
+        temporaryVariables = updatedSemanticContext.temporaryVariables
+        shouldCreateOBJ = updatedSemanticContext.shouldCreateOBJ
       } else if (action?.action === 'ACCEPT') {
         break
       } else if (action?.action === 'ERROR') {
+        shouldCreateOBJ = false
         const updatedContext = ErrorHandler.handle(action.identifier, {
           stack,
           a,
           lexer,
           rulesPrinted,
-          lastToken
+          lastToken,
+          semanticContext: {
+            lastX,
+            semanticStack: nodeStack,
+            ruleIndex: action.identifier,
+            textObject,
+            amountToPopFromStack: 0,
+            ruleSymbol: 'P',
+            symbolTable: lexer.getSymbolTable(),
+            temporaryVariables,
+            shouldCreateOBJ
+          }
         })
+
         stack = updatedContext.stack
         a = updatedContext.a
         rulesPrinted = updatedContext.rulesPrinted
+        lastToken = updatedContext.lastToken
+
+        const { semanticContext: updatedSemanticContext } = updatedContext
+
+        lastX = updatedSemanticContext.lastX
+        nodeStack = updatedSemanticContext.semanticStack
+        textObject = updatedSemanticContext.textObject
+        temporaryVariables = updatedSemanticContext.temporaryVariables
+        shouldCreateOBJ = updatedSemanticContext.shouldCreateOBJ
       } else {
         if (a.classe === 'ERROR') {
+          shouldCreateOBJ = false
           console.log(
             `Erro Léxico: ${
               a.description ?? 'token escrito de maneira incorreta'
@@ -69,7 +128,47 @@ const Parser: Parser = {
       }
     }
 
-    return rulesPrinted
+    if (shouldCreateOBJ) {
+      const tempVariablesTextObject = Array.from(
+        temporaryVariables.values()
+      ).reduce(
+        (previousValue, currentValue) =>
+          previousValue.concat(
+            ` ${currentValue.type} ${currentValue.identifier};\n`
+          ),
+        ''
+      )
+
+      const textObjectWithTempVariables = tempVariablesTextObject.concat(
+        '\n\n',
+        textObject
+      )
+
+      const textObjectWithHeaders = `#include<stdio.h>
+typedef char literal[256];
+void main(void) {
+`.concat(textObjectWithTempVariables)
+
+      const finalTextObject = textObjectWithHeaders.concat(`
+}
+`)
+
+      return {
+        rulesPrinted,
+        object: {
+          shouldCreateOBJ,
+          textObject: finalTextObject
+        }
+      }
+    }
+
+    return {
+      rulesPrinted,
+      object: {
+        shouldCreateOBJ,
+        textObject
+      }
+    }
   }
 }
 

@@ -20,17 +20,13 @@ const testExample = (example: Example) => {
   const reader = Reader(`path/with/content/${fileName}`)
   const lexer = Lexer(reader)
   try {
-    const rulesReduced = Parser.parse(lexer)
+    const { rulesPrinted: rulesReduced } = Parser.parse(lexer)
 
-    for (
-      let reductionNumber = 0;
-      reductionNumber < rulesReduced.length;
-      reductionNumber++
-    ) {
-      const ruleNumber = example.expectedSequence[reductionNumber]
-      const fullRule = GRAMMAR_RULES.get(ruleNumber)
-      expect(fullRule).toBe(rulesReduced.at(reductionNumber))
-    }
+    const rulesExpected = example.expectedSequence.map((ruleNumber) =>
+      GRAMMAR_RULES.get(ruleNumber)
+    )
+
+    expect(rulesReduced).toStrictEqual(rulesExpected)
 
     mock.restore()
   } catch (e: any) {
@@ -189,6 +185,27 @@ fim`,
 
         testExample(exampleWithMultipleLinesAndVariables)
       })
+    })
+
+    test('testing over example file with error', () => {
+      const example: Example = {
+        source: `inicio
+  varinicio
+    literal A;
+    inteiro D;
+    real C ;
+  varfim;
+  escreva "\\nB=\\n;
+  escreva D;
+  escreva "\n";
+  escreva C;
+  escreva "\n";
+  escreva A;
+fim`,
+        expectedSequence: [10, 7, 5, 8, 7, 5, 9, 7, 5, 4, 3, 3, 3, 2, 1]
+      }
+
+      testExample(example)
     })
   })
 

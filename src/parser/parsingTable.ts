@@ -929,8 +929,8 @@ const ACTION_TABLE: ActionTable = new Map([
       ['entao', { action: 'ERROR', identifier: 4 }],
       ['OPR', { action: 'ERROR', identifier: 4 }],
       ['fimse', { action: 'SHIFT', identifier: 35 }],
-      ['fim', { action: 'ERROR', identifier: 4 }],
-      ['EOF', { action: 'ERROR', identifier: 4 }]
+      ['fim', { action: 'ERROR', identifier: 26 }],
+      ['EOF', { action: 'ERROR', identifier: 27 }]
     ])
   ],
   [
@@ -957,8 +957,8 @@ const ACTION_TABLE: ActionTable = new Map([
       ['entao', { action: 'ERROR', identifier: 4 }],
       ['OPR', { action: 'ERROR', identifier: 4 }],
       ['fimse', { action: 'SHIFT', identifier: 35 }],
-      ['fim', { action: 'ERROR', identifier: 4 }],
-      ['EOF', { action: 'ERROR', identifier: 4 }]
+      ['fim', { action: 'ERROR', identifier: 26 }],
+      ['EOF', { action: 'ERROR', identifier: 27 }]
     ])
   ],
   [
@@ -985,8 +985,8 @@ const ACTION_TABLE: ActionTable = new Map([
       ['entao', { action: 'ERROR', identifier: 4 }],
       ['OPR', { action: 'ERROR', identifier: 4 }],
       ['fimse', { action: 'SHIFT', identifier: 35 }],
-      ['fim', { action: 'ERROR', identifier: 4 }],
-      ['EOF', { action: 'ERROR', identifier: 4 }]
+      ['fim', { action: 'ERROR', identifier: 26 }],
+      ['EOF', { action: 'ERROR', identifier: 27 }]
     ])
   ],
   [
@@ -1747,6 +1747,17 @@ const ACTION_TABLE: ActionTable = new Map([
   ]
 ])
 
+const FOLLOW_STATE_TABLE = new Map(
+  Array.from(ACTION_TABLE.entries()).map(([state, actions]) => {
+    const FOLLOW_STATE = new Map(
+      Array.from(actions.entries())
+        .filter(([, action]) => action.action !== 'ERROR')
+        .map(([token]) => [token, null])
+    )
+    return [state, FOLLOW_STATE]
+  })
+)
+
 const GOTO_TABLE: GotoTable = new Map([
   [0, new Map<NonTerminals, number>([['P', 1]])],
   [2, new Map<NonTerminals, number>([['V', 3]])],
@@ -2088,6 +2099,7 @@ export {
   ACTION_TABLE,
   GOTO_TABLE,
   FOLLOW_TABLE,
+  FOLLOW_STATE_TABLE,
   GRAMMAR_RULES,
   POP_AMOUNT_PER_RULE,
   RULE_LETTER,

@@ -9,7 +9,11 @@
   "private": true,
   "scripts": {
     "test": "jest",
+    "test:lexer": "jest lexer",
+    "test:parser": "jest parser",
+    "test:semantic": "jest semantic",
     "test:coverage": "jest --coverage",
+    "compile": "ts-node -r tsconfig-paths/register src/index.ts",
     "lint": "eslint src/**/*.ts"
   },
   "husky": {
@@ -32,6 +36,7 @@
     "husky": "^8.0.2",
     "prettier": "^2.8.0",
     "ts-jest": "^29.0.3",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^3.14.2"
   }
 }

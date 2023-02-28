@@ -27,7 +27,8 @@ const Lexer: LexerConstructor = (reader: Reader) => {
       state: 0,
       start: { line: 0, column: 0 },
       end: { line: 0, column: 0 }
-    })
+    }),
+    getSymbolTable: () => symbols
   }
 }
 
@@ -148,6 +149,8 @@ const postProcess = (token: Token): Token | null => {
   } else if (token.classe === 'ERROR') {
     token.description += `, linha: ${token.start.line} e coluna: ${token.start.column}`
     return token
+  } else if (token.classe === 'LIT') {
+    token.lexema = token.lexema.replaceAll('\n', '\\n').replaceAll('\t', '\\t')
   }
 
   return token

@@ -49,6 +49,10 @@ const ERRORS = {
   UNEXPECTED_CHARACTER: {
     STATE_INDEX: 101,
     DESCRIPTION: 'Erro caractere inesperado'
+  },
+  WHITE_SPACE_LOOP: {
+    STATE_INDEX: 99,
+    DESCRIPTION: 'Erro white space'
   }
 }
 
@@ -183,6 +187,18 @@ const createSkipWhitespaceOnStart = (updateFunctions: {
     state: ERRORS.INVALID_PATTERN.STATE_INDEX,
     classOfToken: 'ERROR',
     description: ERRORS.INVALID_PATTERN.DESCRIPTION,
+    typeOfToken: 'NULO'
+  })
+
+  updateTransitionTable(0, ERRORS.WHITE_SPACE_LOOP.STATE_INDEX, '\\')
+  updateTransitionTable(ERRORS.WHITE_SPACE_LOOP.STATE_INDEX, 0, 'nt', {
+    defaultTransition: ERRORS.INVALID_PATTERN.STATE_INDEX
+  })
+
+  updateStatesInfo({
+    state: ERRORS.WHITE_SPACE_LOOP.STATE_INDEX,
+    classOfToken: 'ERROR',
+    description: ERRORS.WHITE_SPACE_LOOP.DESCRIPTION,
     typeOfToken: 'NULO'
   })
 }
