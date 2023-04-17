@@ -1,4 +1,4 @@
-# mgol-compiler
+# alg-compiler
 
 ## Como usar
 
